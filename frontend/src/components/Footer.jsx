@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from "framer-motion"
+import Logo from './utils/Logo';
 
 function Footer() {
   return (
@@ -12,14 +12,7 @@ function Footer() {
             <div className="flex h-full flex-col justify-between">
               <div className="mb-4 inline-flex items-center">
                 <Link to='/'>
-                    <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    whileHover={{scale: 1.03}}
-                    className='font-extralight text-5xl'>
-                        SyncSheet
-                    </motion.div>
+                    <Logo size='text-5xl' />
                 </Link>
               </div>
               <div>

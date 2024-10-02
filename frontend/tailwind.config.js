@@ -8,8 +8,9 @@ export default {
     extend: {
       colors: {
         'main-text': '#1C2833',
-        'golden': '#D4AF37',
-        'light-golden': '#F2D16D'
+        'golden': '#E3A831',
+        'light-golden': '#FAD623',
+        'bg-main': '#F8F9FA'
       }
     },
   },
