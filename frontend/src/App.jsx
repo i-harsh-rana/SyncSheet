@@ -6,7 +6,9 @@ import Header from './components/Header';
 import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
 
+
 function App() {
+  
   return (
     <>
     <Router>
