@@ -16,7 +16,7 @@ function SignUp() {
   };
 
   return (
-    <div className='m-3 flex flex-col lg:flex-row text-main-text'>
+    <div className='m-3 flex flex-col lg:flex-row text-main-text justify-center'>
       {/* Form Section */}
       <div className='flex justify-center items-center w-full lg:w-2/3'>
         <div className='grid place-content-center w-4/5'>
