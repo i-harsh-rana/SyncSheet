@@ -3,7 +3,7 @@ import GoldenGlittery from './GoldenGlittery'
 
 function Home() {
   return (
-    <div className='flex justify-center p-18'>
+    <div className='flex justify-center p-12'>
       <div>
           <GoldenGlittery/>
       </div>
