@@ -12,10 +12,10 @@ function Login() {
   const {register, handleSubmit, formState: {errors}, reset} = useForm();
   const [hidePassword, setHidePassword] = useState(true);
   
-
   const handleLogin = ()=>{
 
   };
+  
   return (
     <div className='m-3 flex flex-col lg:flex-row text-main-text'>
       {/* Image Section */}
