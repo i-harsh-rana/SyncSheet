@@ -73,8 +73,12 @@ const registerUser = asyncHandler(async(req, res)=>{
 const userLogin = asyncHandler(async(req, res)=>{
     const {username, email, password} = req.body;
 
-    if((!username && !email) || !email){
-        throw new ApiError(404, "Username or email and password is required");
+    if (!username && !email) {
+        throw new ApiError(404, "Username or email is required");
+    }
+    
+    if (!password) {
+        throw new ApiError(404, "Password is required");
     }
 
     const existedUser = await User.findOne({
@@ -91,7 +95,9 @@ const userLogin = asyncHandler(async(req, res)=>{
         throw new ApiError(401, "Incorrect password, please try again");
     }
 
-    const {refreshToken, accessToken} = generateRefreshAndAccessToken(existedUser._id);
+    const {refreshToken, accessToken} = await generateRefreshAndAccessToken(existedUser._id);
+
+    await User.findByIdAndUpdate(existedUser._id, { refreshToken });
 
     const loginUser = await User.findById(existedUser._id).select("-password -refreshToken");
 
@@ -111,7 +117,12 @@ const userLogin = asyncHandler(async(req, res)=>{
 })
 
 const logoutUser = asyncHandler(async(req, res)=>{
-    await User.findByIdAndUpdate(
+
+    if (!req.user || !req.user._id) {
+        throw new ApiError(401, "No user found to log out");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
             $unset: {
@@ -121,7 +132,11 @@ const logoutUser = asyncHandler(async(req, res)=>{
         {
             new: true
         }
-    )
+    );
+
+    if (!updatedUser) {
+        throw new ApiError(404, "User not found");
+    }
 
     const options = {
         httpOnly: true, 

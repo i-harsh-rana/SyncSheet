@@ -4,17 +4,57 @@ import {motion} from 'framer-motion'
 import Logo from '../utils/Logo'
 import { useForm } from 'react-hook-form'
 import Input from '../utils/Input'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import FactImage from '../utils/factImage'
+import axios from 'axios'
+import qs from 'qs'
+import { useMutation } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux'
+import {login} from '../../store/authStore'
 
+const handleLogin = async (data)=>{
+
+  const formData = qs.stringify({
+    username: data.usernameOrEmail.includes('@') ? undefined : data.usernameOrEmail,
+    email: data.usernameOrEmail.includes('@') ? data.usernameOrEmail : undefined,
+    password: data.password,
+  }); 
+
+  try {
+    const response = await axios.post('/api/v1/user/login', formData, {
+      headers:{
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      withCredentials: true
+    }) 
+
+    if(response.status === 200){
+      return response?.data?.data;
+    }
+  } catch (error) {
+    console.error('Login failed:', error.response ? error.response.data : error.message);
+  }
+};
 
 function Login() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {register, handleSubmit, formState: {errors}, reset} = useForm();
   const [hidePassword, setHidePassword] = useState(true);
   
-  const handleLogin = ()=>{
-
-  };
+  const { mutate } = useMutation({
+    mutationFn: handleLogin,
+    onSuccess: (data)=>{
+      reset();
+      dispatch(login(data));
+      navigate('/');
+    },
+    onError: (error)=>{
+      console.error('Login Failed: ', error);
+      
+    }
+  })
+ 
   
   return (
     <div className='m-3 flex flex-col lg:flex-row text-main-text'>
@@ -44,7 +84,7 @@ function Login() {
               <div className='text-center text-xl font-light text-main-text mb-7 mt-3'>
                 Welcome Back User!
               </div>
-              <form onSubmit={handleSubmit(handleLogin)}>
+              <form onSubmit={handleSubmit((data)=>mutate(data))}>
                 <Input
                   label="Username or Email"
                   {...register("usernameOrEmail", { required: 'Username or Email is required' })}
