@@ -42,7 +42,6 @@ const Editor = () => {
         ]}
         value={content}
         onChange={setContent}
-        placeholder="Write something amazing..."
         className="bg-white rounded-lg shadow-md editor-container"
       />
       <style>{`
