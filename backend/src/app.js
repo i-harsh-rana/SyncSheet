@@ -25,8 +25,10 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 import userRouter from './routes/user.route.js'
+import documentRouter from './routes/document.route.js'
 
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/document', documentRouter);
 
 io.on('connection', (socket) => {
     console.log('A user connected');
