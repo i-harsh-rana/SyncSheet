@@ -31,7 +31,7 @@ const documentSchema = new Schema({
             type: Number,
             required: true
         },
-        changes:{
+        content:{
             type: String,
             required: true
         },

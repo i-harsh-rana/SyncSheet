@@ -30,38 +30,37 @@ app.use('/api/v1/user', userRouter);
 
 io.on('connection', (socket) => {
     console.log('A user connected');
-
-    socket.on('joinDocument', (docId) => {
-        socket.join(docId);
-        console.log('User connected to doc:', docId);
+  
+    socket.on('joinDocument', (documentId) => {
+      socket.join(documentId);
+      console.log(`User joined document: ${documentId}`);
     });
-
-    socket.on('updateDocument', async (docId, content, userId) => {
-        try {
-            const document = await Document.findById(docId);
-
-            if (!document) {
-                return socket.emit('error', 'Document not found');
-            }
-
-            document.content = content;
-            document.version.push({
-                versionNumber: document.version.length + 1,
-                change: "Content updated",
-                editedBy: userId
-            });
-
-            await document.save();
-
-            io.to(docId).emit('contentUpdate', { content, userId });
-        } catch (error) {
-            console.error('Error updating document:', error);
-            socket.emit('error', 'Failed to update document');
+  
+    socket.on('text-change', async ({ documentId, delta, userId }) => {
+      try {
+        const document = await Document.findById(documentId);
+        if (!document) {
+          return socket.emit('error', 'Document not found');
         }
+  
+        document.content = delta;
+        document.version.push({
+          versionNumber: document.version.length + 1,
+          content: delta,
+          editedBy: userId
+        });
+  
+        await document.save();
+  
+        socket.to(documentId).emit('text-change', { delta, userId });
+      } catch (error) {
+        console.error('Error updating document:', error);
+        socket.emit('error', 'Failed to update document');
+      }
     });
-
+  
     socket.on('disconnect', () => {
-        console.log('User Disconnected');
+      console.log('User disconnected');
     });
 });
 
