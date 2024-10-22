@@ -1,8 +1,8 @@
 
-import { Document } from "../models/document.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Document } from "../models/document.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createDocument = asyncHandler(async(req, res)=>{
         const userId = req.user._id;
@@ -14,7 +14,7 @@ const createDocument = asyncHandler(async(req, res)=>{
             permissions: [],
             version: [{
                 versionNumber: 1,
-                content: req.body.content,
+                content: req.body.content || ' ',
                 editedBy: userId
             }]
         })

@@ -22,8 +22,7 @@ const documentSchema = new Schema({
         },
         permission: {
             type: String,
-            enum: ['read-only', 'read-write'],
-            required: true
+            enum: ['read-only', 'read-write']
         }
     }],
     version: [{
@@ -37,7 +36,7 @@ const documentSchema = new Schema({
         },
         timestamp:{
             type: Date,
-            default: Data.now
+            default: Date.now
         },
         editedBy: {
             type: Schema.Types.ObjectId,

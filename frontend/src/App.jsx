@@ -6,6 +6,7 @@ import Header from './components/Header/Header.jsx';
 import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
 import Editor from './components/Editor.jsx';
+import AllDocument from './components/pages/AllDocument.jsx';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path='/login' element={<Login/>}/>
           <Route path='/signup' element={<SignUp/>}/>
           <Route path='/editor' element={<Editor/>}/>
+          <Route path='/allDocuments' element={<AllDocument/>}/>
         </Routes>
       </div>
       <Footer/>
