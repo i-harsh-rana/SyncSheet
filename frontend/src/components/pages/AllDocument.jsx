@@ -4,7 +4,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import Input from '../utils/Input';
-import { Mutation } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 
 function AllDocument() {
   const [createFrom, setCreateForm] = useState(false);
@@ -93,15 +93,17 @@ function AllDocument() {
           </motion.div>
           { data.length > 0 && (
             data.map((doc)=>(
-              <motion.div 
-              initial={{scale: 1}}
-              whileHover={{scale: 1.05}}
-              whileTap={{scale: 1}}
-              exit={{scale: 1}}
-              key={doc._id}
-              className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/40 flex items-center font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
-                  {doc.title}
-              </motion.div>
+              <Link to={`/editor/${doc._id}`}>
+                <motion.div 
+                initial={{scale: 1}}
+                whileHover={{scale: 1.05}}
+                whileTap={{scale: 1}}
+                exit={{scale: 1}}
+                key={doc._id}
+                className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/40 flex items-center font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
+                    {doc.title}
+                </motion.div>
+              </Link>
             ))
           ) 
         }

@@ -48,7 +48,7 @@ const getDocumentByID = asyncHandler(async(req, res)=>{
     const {id} = req.params;
     const userId = req.user._id;
 
-    const document = await Document.findById(id).populate('owner', 'name email').populate('permissions.userId', 'name email');
+    const document = await Document.findById(id).populate('owner', 'fullName email avatar').populate('permissions.userId', 'fullName email');
 
     if(!document){
         throw new ApiError(404, 'No such document found');
@@ -157,7 +157,7 @@ const deleteDocument = asyncHandler(async(req, res)=>{
         throw new ApiError(403, "Access Denied");
     }
 
-    await document.remove();
+    await Document.deleteOne({ _id: id });
 
     return res 
     .status(200)

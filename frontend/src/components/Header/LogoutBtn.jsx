@@ -48,7 +48,7 @@ function LogoutBtn() {
         onClick={()=>mutate()}
         disabled={isLoading}
         >
-            {isLoading ? 'Logging out...' : 'Logout'} <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
+            {isLoading ? 'Logging out...' : 'Logout'} <i className="fa-solid fa-arrow-right-from-bracket ml-1"></i>
         </motion.button>
     </div>
   )

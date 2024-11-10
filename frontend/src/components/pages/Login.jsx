@@ -11,6 +11,7 @@ import qs from 'qs'
 import { useMutation } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux'
 import {login} from '../../store/authStore'
+import LoginSignupBtn from '../utils/LoginSignupBtn.jsx'
 
 const handleLogin = async (data)=>{
 
@@ -102,20 +103,16 @@ function Login() {
                   </span>
                 </div>
                 <div className='flex justify-between items-end mt-6'>
-                  <motion.button
-                    initial={{scale: 1}}
-                    whileHover={{scale: 1.03}}
-                    whileTap={{scale: 0.95}}
-                    type='submit'
-                    className='text-white font-light bg-golden text-sm px-6 py-2 rounded-full'
-                  >
-                    Login <i className="fa-solid fa-arrow-right-to-bracket ml-1"></i>
-                  </motion.button>
-                  <Link to='/signup'>
-                    <div className='text-sm font-light text-golden cursor-pointer hover:underline'>
-                      New User? Please SignUp
-                    </div>
-                  </Link>
+                  <div className='mb-6'>
+                    <LoginSignupBtn children='Login'/>
+                  </div>
+                  <div>
+                    <Link to='/signup'>
+                      <div className='text-sm font-light text-golden cursor-pointer hover:underline'>
+                        New User? Please SignUp
+                      </div>
+                    </Link>
+                  </div>
                 </div>
               </form>
             </div>

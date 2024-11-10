@@ -10,13 +10,13 @@ router.route('/createDoc').post(createDocument);
 
 router.route('/getAllDocs').get(getDocuments);
 
-router.route('/openDoc').get(getDocumentByID);
+router.route('/openDoc/:id').get(getDocumentByID);
 
 router.route('/shareDoc').post(shareDocument);
 
 router.route('/updateDoc').put(updateDocument);
 
-router.route('/deleteDoc').delete(deleteDocument);
+router.route('/deleteDoc/:id').delete(deleteDocument);
 
 router.route('/undoDoc').post(revertToVersion);
 
