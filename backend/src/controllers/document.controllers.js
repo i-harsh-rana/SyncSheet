@@ -54,15 +54,15 @@ const getDocumentByID = asyncHandler(async(req, res)=>{
         throw new ApiError(404, 'No such document found');
     }
 
-    const isOwner = document.owner._id.equals(userId);
+    // const isOwner = document.owner._id.equals(userId);
 
-    const hasPermission = document.permissions.some(
-        (perm) => perm.userId._id.equals(userId) && perm.permission === 'read-write'
-    );
+    // const hasPermission = document.permissions.some(
+    //     (perm) => perm.userId._id.equals(userId) && perm.permission === 'read-write'
+    // );
 
-    if(!isOwner && !hasPermission){
-        throw new ApiError(403, 'Access denied');
-    }
+    // if(!isOwner && !hasPermission){
+    //     throw new ApiError(403, 'Access denied');
+    // }
 
     return res 
     .status(200)

@@ -7,7 +7,7 @@ const documentSchema = new Schema({
         default: "Untitled Document"
     },
     content: {
-        type: String,
+        type: Schema.Types.Mixed,
         default: ''
     },
     owner: {
@@ -31,7 +31,7 @@ const documentSchema = new Schema({
             required: true
         },
         content:{
-            type: String,
+            type: Schema.Types.Mixed,
             required: true
         },
         timestamp:{

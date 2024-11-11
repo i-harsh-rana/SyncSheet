@@ -5,57 +5,214 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import { useSelector } from 'react-redux';
+import { useRef, forwardRef } from 'react';
+
+const CustomQuill = forwardRef((props, ref) => (
+  <ReactQuill ref={ref} {...props} />
+));
 
 const Editor = () => {
   const [content, setContent] = useState('');
-  const {docID} = useParams();
+  const { docID } = useParams();
   const [deleteConf, setdeleteConf] = useState(false);
   const navigate = useNavigate();
   const [deleteStatus, setDeleleteStatus] = useState(false);
   const [deleteSuccess, setDeleleteSuccess] = useState(false);
+  const socketRef = useRef(null);
+  const editorRef = useRef(null);
+  const currentUser = useSelector((state) => state.auth.userData);
+  const [socketError, setSocketError] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [updateError, setUpdateError] = useState(null);
+  const lastUpdateRef = useRef(null);
 
-  const{data, isLoading, isError, error} = useQuery({
-    queryKey : [`/editor/${docID}`],
-    queryFn : async()=>{
-
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: [`/editor/${docID}`],
+    queryFn: async () => {
       const response = await axios.get(`/api/v1/document/openDoc/${docID}`, {
         withCredentials: true
       });
 
-      if(response.status === 200){
-        console.log(response.data?.data);
-        
+      if (response.status === 200) {
         return response.data?.data;
-      }else{
-        console.error(response);
+      } else {
+        throw new Error('Failed to fetch document');
       }
     }
-  })
+  });
 
   useEffect(() => {
     if (data && data.content) {
-      setContent(data.content); 
+      setContent(data.content);
     }
   }, [data]);
 
-  const handleDocDelete = async()=>{
+  useEffect(() => {
+    const initializeSocket = () => {
+      try {
+        const socketUrl = import.meta.env.VITE_SERVER_URL;
+        
+        socketRef.current = io(socketUrl, {
+          withCredentials: true,
+          transports: ['websocket', 'polling'],
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+          autoConnect: true,
+          timeout: 10000
+        });
+
+        socketRef.current.on('connect', () => {
+          console.log('Socket connected:', socketRef.current.id);
+          setIsConnected(true);
+          setSocketError(null);
+          socketRef.current.emit('joinDocument', docID);
+        });
+
+        socketRef.current.on('connect_error', (error) => {
+          console.error('Socket connection error:', error);
+          setSocketError('Failed to connect to server');
+          setIsConnected(false);
+        });
+
+        socketRef.current.on('disconnect', (reason) => {
+          console.log('Socket disconnected:', reason);
+          setIsConnected(false);
+        });
+
+        socketRef.current.on('text-change', ({ delta, editorName, content: newContent }) => {
+          if (editorRef.current) {
+            const editor = editorRef.current.getEditor();
+            
+            // Only apply changes if they're newer than our last update
+            if (!lastUpdateRef.current || 
+                lastUpdateRef.current < Date.now() - 100) {
+              editor.updateContents(delta);
+              setContent(newContent);
+              console.log(`Changes made by: ${editorName}`);
+            }
+          }
+        });
+
+        socketRef.current.on('error', (message) => {
+          console.error('Socket error:', message);
+          setSocketError(message);
+          // Clear error after 5 seconds
+          setTimeout(() => setSocketError(null), 5000);
+        });
+
+        socketRef.current.on('update-error', (error) => {
+          console.error('Document update error:', error);
+          setUpdateError(error);
+          // Clear error after 5 seconds
+          setTimeout(() => setUpdateError(null), 5000);
+        });
+
+        socketRef.current.on('update-success', () => {
+          setUpdateError(null);
+        });
+
+      } catch (err) {
+        console.error('Socket initialization error:', err);
+        setSocketError('Failed to initialize socket connection');
+      }
+    };
+
+    initializeSocket();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off('connect');
+        socketRef.current.off('disconnect');
+        socketRef.current.off('connect_error');
+        socketRef.current.off('text-change');
+        socketRef.current.off('error');
+        socketRef.current.off('update-error');
+        socketRef.current.off('update-success');
+        socketRef.current.disconnect();
+      }
+    };
+  }, [docID]);
+
+  // Debounce function to prevent too frequent updates
+  const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  const handleTextChange = debounce((value, delta, source) => {
+    if (source === 'user' && socketRef.current?.connected) {
+      lastUpdateRef.current = Date.now();
+      
+      try {
+        socketRef.current.emit('text-change', {
+          documentId: docID,
+          delta,
+          userId: currentUser._id,
+          content: value
+        }, (acknowledgement) => {
+          if (acknowledgement?.error) {
+            setUpdateError(acknowledgement.error);
+          } else {
+            setContent(value);
+            setUpdateError(null);
+          }
+        });
+      } catch (err) {
+        console.error('Error emitting text change:', err);
+        setUpdateError('Failed to send update to server');
+      }
+    }
+  }, 100); // Debounce for 100ms
+
+  const handleDocDelete = async () => {
     setDeleleteStatus(true);
     try {
       const response = await axios.delete(`/api/v1/document/deleteDoc/${data._id}`, {
         withCredentials: true
-      })
+      });
 
-      if(response.status === 200){
+      if (response.status === 200) {
         setDeleleteSuccess(true);
-        setTimeout(()=>{navigate('/allDocuments');}, 2000)
+        setTimeout(() => {
+          navigate('/allDocuments');
+        }, 2000);
       }
     } catch (error) {
-      setDeleleteStatus(false)
-      console.log(error, 'error while deleteing doc!');
+      setDeleleteStatus(false);
+      console.error('Error deleting document:', error);
     }
-  }
+  };
+
+  const renderConnectionStatus = () => {
+    if (socketError) {
+      return (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md mb-4">
+          Connection Error: {socketError}
+        </div>
+      );
+    }
+    if (updateError) {
+      return (
+        <div className="bg-orange-100 border border-orange-400 text-orange-700 px-4 py-2 rounded-md mb-4">
+          Update Error: {updateError}
+        </div>
+      );
+    }
+    if (!isConnected) {
+      return (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded-md mb-4">
+          Connecting to server...
+        </div>
+      );
+    }
+    return null;
+  };
 
   const modules = {
     toolbar: [
@@ -118,7 +275,9 @@ const Editor = () => {
           </div>
         </div>
       </div>
-      <ReactQuill
+      {renderConnectionStatus()}
+      <CustomQuill
+        ref={editorRef}
         theme="snow"
         modules={modules}
         formats={[
@@ -132,9 +291,10 @@ const Editor = () => {
           'link', 'image', 'video'
         ]}
         value={content}
-        onChange={setContent}
+        onChange={handleTextChange}
         className="bg-white rounded-lg shadow-md editor-container"
       />
+
       <style>{`
         .editor-container .ql-toolbar {
           border-top-left-radius: 0.5rem;
