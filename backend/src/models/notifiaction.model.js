@@ -19,7 +19,7 @@ const notificationSchema = new Schema({
     invitationId: {
         type: Schema.Types.ObjectId,
         ref: 'Invitation',
-        required: true
+        required: false
     },
     message: {
         type: String,
@@ -28,7 +28,7 @@ const notificationSchema = new Schema({
     status: {
         type: String,
         enum: ['unread', 'read'],
-        default: unread
+        default: 'unread'
     }
 })
 

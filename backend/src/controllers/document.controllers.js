@@ -54,15 +54,17 @@ const getDocumentByID = asyncHandler(async(req, res)=>{
         throw new ApiError(404, 'No such document found');
     }
 
-    // const isOwner = document.owner._id.equals(userId);
+    const isOwner = document.owner._id.equals(userId);
 
-    // const hasPermission = document.permissions.some(
-    //     (perm) => perm.userId._id.equals(userId) && perm.permission === 'read-write'
-    // );
+    const isAllowedToAll = document.allowTOAll;
 
-    // if(!isOwner && !hasPermission){
-    //     throw new ApiError(403, 'Access denied');
-    // }
+    const hasPermission = document.permissions.some(
+        (perm) => perm.userId._id.equals(userId) && perm.permission === 'read-write'
+    );
+
+    if(!isOwner && !hasPermission && !isAllowedToAll){
+        throw new ApiError(403, 'Access denied');
+    }
 
     return res 
     .status(200)
@@ -201,6 +203,27 @@ const revertToVersion = asyncHandler(async(req, res)=>{
     );
 })
 
+const toogleAllowToAll = asyncHandler(async(req, res)=>{
+    const {id} = req.params;
+
+    const document = await Document.findById(id);
+
+    if(!document){
+        throw new ApiError(404, 'No Such Document found');
+    }
+
+    document.allowTOAll = !document.allowTOAll;
+    await document.save({ validateBeforeSave: false });
+
+    const currectStatus = document.allowTOAll;
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, currectStatus, 'toggle successfull')
+    )
+})
+
 export {
     createDocument,
     getDocuments,
@@ -208,5 +231,6 @@ export {
     updateDocument,
     shareDocument,
     deleteDocument,
-    revertToVersion
+    revertToVersion,
+    toogleAllowToAll
 }

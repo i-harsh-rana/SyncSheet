@@ -5,7 +5,7 @@ import Home from '../src/components/pages/Home/Home'
 import Header from './components/Header/Header.jsx';
 import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
-import Editor from './components/Editor.jsx';
+import Editor from './components/pages/Editor/Editor.jsx';
 import AllDocument from './components/pages/AllDocument.jsx';
 
 

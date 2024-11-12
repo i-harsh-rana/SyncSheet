@@ -9,7 +9,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { useRef, forwardRef } from 'react';
+import DocPermission from './DocPermission';
+import AccessDropDown from './AccessDropDown'
+import InviteButton from './InviteButton';
 
+//custom quill editor
 const CustomQuill = forwardRef((props, ref) => (
   <ReactQuill ref={ref} {...props} />
 ));
@@ -29,6 +33,7 @@ const Editor = () => {
   const [updateError, setUpdateError] = useState(null);
   const lastUpdateRef = useRef(null);
 
+  //fetching initial data 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: [`/editor/${docID}`],
     queryFn: async () => {
@@ -37,6 +42,8 @@ const Editor = () => {
       });
 
       if (response.status === 200) {
+        console.log(response.data?.data);
+        
         return response.data?.data;
       } else {
         throw new Error('Failed to fetch document');
@@ -44,14 +51,16 @@ const Editor = () => {
     }
   });
 
+  //setting content in quill
   useEffect(() => {
     if (data && data.content) {
       setContent(data.content);
     }
   }, [data]);
 
+  //scoket.io initialisation and functionality
   useEffect(() => {
-    const initializeSocket = () => {
+    const initialiseSocket = () => {
       try {
         const socketUrl = import.meta.env.VITE_SERVER_URL;
         
@@ -87,8 +96,7 @@ const Editor = () => {
             const editor = editorRef.current.getEditor();
             
             // Only apply changes if they're newer than our last update
-            if (!lastUpdateRef.current || 
-                lastUpdateRef.current < Date.now() - 100) {
+            if (!lastUpdateRef.current || lastUpdateRef.current < Date.now() - 100) {
               editor.updateContents(delta);
               setContent(newContent);
               console.log(`Changes made by: ${editorName}`);
@@ -120,7 +128,7 @@ const Editor = () => {
       }
     };
 
-    initializeSocket();
+    initialiseSocket();
 
     return () => {
       if (socketRef.current) {
@@ -257,6 +265,10 @@ const Editor = () => {
           {data?.title}
         </div>
         <div className='flex space-x-3 p-5 items-center'>
+          <div className='relative flex items-center space-x-6'>
+            <InviteButton/>
+            <AccessDropDown/>
+          </div>
           <img
             src={data?.owner?.avatar}
             alt={`${data?.owner?.fullName}'s avatar`}

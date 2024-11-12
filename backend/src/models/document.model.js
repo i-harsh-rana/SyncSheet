@@ -15,6 +15,10 @@ const documentSchema = new Schema({
         ref: 'User',
         required: true
     },
+    allowToAll: {
+        type: Boolean,
+        default: false
+    },
     permissions: [{
         userId: {
             type: Schema.Types.ObjectId,
