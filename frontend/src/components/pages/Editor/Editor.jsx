@@ -12,6 +12,7 @@ import { useRef, forwardRef } from 'react';
 import DocPermission from './DocPermission';
 import AccessDropDown from './AccessDropDown'
 import InviteButton from './InviteButton';
+import { IoPersonAddOutline } from "react-icons/io5";
 
 //custom quill editor
 const CustomQuill = forwardRef((props, ref) => (
@@ -32,6 +33,7 @@ const Editor = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [updateError, setUpdateError] = useState(null);
   const lastUpdateRef = useRef(null);
+  
 
   //fetching initial data 
   const { data, isLoading, isError, error } = useQuery({
@@ -266,7 +268,7 @@ const Editor = () => {
         </div>
         <div className='flex space-x-3 p-5 items-center'>
           <div className='relative flex items-center space-x-6'>
-            <InviteButton/>
+            <InviteButton />
             <AccessDropDown/>
           </div>
           <img
@@ -366,6 +368,8 @@ const Editor = () => {
         }
       `}</style>
 
+
+      {/* Delete Confirmation*/}
       <AnimatePresence>
           {deleteConf && (
               <motion.div 
@@ -443,6 +447,9 @@ const Editor = () => {
               </motion.div>
           )}
       </AnimatePresence>  
+
+       {/* Invite Window*/}
+       
     </div>
   );
 };

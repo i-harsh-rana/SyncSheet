@@ -195,9 +195,37 @@ const acceptInvite = asyncHandler(async (req, res) => {
     );
 });
 
+const allPendingInvites = asyncHandler(async(req, res)=>{
+    const {id} = req.params;
+
+    if(!id){
+        throw new ApiError(400, "Please provide proper document ID")
+    }
+
+    const document = await Document.findById(id);
+    if(!document){
+        throw new ApiError(404, "No such document found")
+    }
+
+    const currentUser = req.user._id;
+
+    if (!document.owner.equals(currentUser)) {  
+        throw new ApiError(403, "Access denied");  
+    }
+
+    const allPendingInvites = await Invitation.find({documentId: id, status: 'pending'});
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, allPendingInvites, "Send Successfully")
+    )
+})
+
 export {
     sendInvite,
     cancelInvite,
     cleanupExpiredInvitations,
     acceptInvite,
+    allPendingInvites
 }
