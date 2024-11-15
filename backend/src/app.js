@@ -7,6 +7,7 @@ import { Document } from './models/document.model.js';
 import { User } from './models/user.model.js';
 import userRouter from './routes/user.route.js';
 import documentRouter from './routes/document.route.js';
+import invitationRouter from './routes/invitation.route.js'
 
 const app = express();
 const server = http.createServer(app);
@@ -34,6 +35,7 @@ app.use(cookieParser());
 // Route Handlers
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/document', documentRouter);
+app.use('/api/v1/invitation', invitationRouter);
 
 // Socket.IO Event Handlers
 io.on('connection', (socket) => {

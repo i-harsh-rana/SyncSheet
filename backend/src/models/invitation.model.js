@@ -10,6 +10,10 @@ const invitationSchema = new Schema({
         type: String, 
         required: true
     },
+    invitedUserName: {
+        type: String, 
+        required: true
+    },
     permission: {
         type: String, 
         enum: ['read-only', 'read-write'],

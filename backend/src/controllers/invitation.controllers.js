@@ -57,6 +57,7 @@ const sendInvite = asyncHandler(async (req, res) => {
     const newInvite = await Invitation.create({
         documentId: docId,
         invitedUserEmail: email,
+        invitedUserName: userToInvite.fullName,
         permission: permission,
     });
 
@@ -130,7 +131,7 @@ const cancelInvite = asyncHandler(async(req, res) => {
         );
 });
 
-const cleanupExpiredInvitations = async () => {
+const cleanupExpiredInvitations = asyncHandler(async () => {
     try {
         const result = await Invitation.deleteMany({
             expiredAt: { $lt: new Date() },
@@ -140,7 +141,7 @@ const cleanupExpiredInvitations = async () => {
     } catch (error) {
         console.error('Failed to cleanup expired invitations:', error);
     }
-};
+});
 
 const acceptInvite = asyncHandler(async (req, res) => {
     const { inviteId } = req.params;

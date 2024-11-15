@@ -12,7 +12,6 @@ import { useRef, forwardRef } from 'react';
 import DocPermission from './DocPermission';
 import AccessDropDown from './AccessDropDown'
 import InviteButton from './InviteButton';
-import { IoPersonAddOutline } from "react-icons/io5";
 
 //custom quill editor
 const CustomQuill = forwardRef((props, ref) => (
@@ -44,8 +43,6 @@ const Editor = () => {
       });
 
       if (response.status === 200) {
-        console.log(response.data?.data);
-        
         return response.data?.data;
       } else {
         throw new Error('Failed to fetch document');
@@ -268,7 +265,7 @@ const Editor = () => {
         </div>
         <div className='flex space-x-3 p-5 items-center'>
           <div className='relative flex items-center space-x-6'>
-            <InviteButton />
+            <InviteButton docId={docID}/>
             <AccessDropDown/>
           </div>
           <img
