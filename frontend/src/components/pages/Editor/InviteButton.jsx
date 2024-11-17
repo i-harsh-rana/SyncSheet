@@ -12,7 +12,7 @@ import { FcCancel } from "react-icons/fc";
 import axios from 'axios';
 
 function InviteButton({docId}) {
-  const [inviteWindow, setInviteWindow] = useState(true);
+  const [inviteWindow, setInviteWindow] = useState(false);
   const [inviteSendStatus, setInviteSendStatus] = useState(false);
   const {register: inviteRegister, handleSubmit: inviteHandleSubmit, formState: {errors: inviteError}, reset: inviteReset} = useForm();
   const [previousInvites, setPreviousInvites] = useState([]);
@@ -194,7 +194,7 @@ function InviteButton({docId}) {
                                 key={pendingInvite._id}
                                 className="group border-[0.07rem] rounded-lg my-3 p-3 flex items-center text-sm justify-between font-light"
                               >
-                                <div className="group-hover:scale-110 transform transition duration-200 group-hover:translate-x-2">
+                                <div className="group-hover:scale-105 transform transition duration-200 ">
                                   To : {pendingInvite.invitedUserName}
                                   <div className="text-xs opacity-70">{pendingInvite.invitedUserEmail}</div>
                                 </div>

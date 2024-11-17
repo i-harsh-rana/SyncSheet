@@ -27,7 +27,7 @@ const invitationSchema = new Schema({
     expiredAt: {
         type: Date,
         default: () => Date.now() + 7 * 24 * 60 * 1000
-    }
+    },
 }, {timestamps: true})
 
 export const Invitation = mongoose.model('Invitation', invitationSchema)

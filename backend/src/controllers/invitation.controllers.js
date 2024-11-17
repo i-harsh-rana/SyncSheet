@@ -221,6 +221,36 @@ const allPendingInvites = asyncHandler(async(req, res)=>{
     .json(
         new ApiResponse(200, allPendingInvites, "Send Successfully")
     )
+});
+
+const allInvitation = asyncHandler(async(req, res)=>{
+    const currentUser = req.user;
+
+    if(!currentUser){
+        throw new ApiError(404, "Please login to access inivites");
+    }
+
+    const findAllInivites = await Invitation.find({invitedUserEmail: currentUser.email}).populate({
+        path: 'documentId',
+        select: 'title owner',
+        populate: {
+            path: 'owner',
+            select: 'fullName username'
+        }
+    }).select('documentId permission createdAt _id');
+
+    if (findAllInivites.length === 0) {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, [], "No invitations found"));
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, findAllInivites, "Success")
+    )    
+
 })
 
 export {
@@ -228,5 +258,6 @@ export {
     cancelInvite,
     cleanupExpiredInvitations,
     acceptInvite,
-    allPendingInvites
+    allPendingInvites,
+    allInvitation
 }
