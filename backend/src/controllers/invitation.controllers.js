@@ -147,7 +147,7 @@ const acceptInvite = asyncHandler(async (req, res) => {
     const { inviteId } = req.params;
     const userId = req.user._id;  // Assumes authenticated user’s ID is in req.user
     const userEmail = req.user.email;  // Assumes user’s email is in req.user
-
+    
     // Step 1: Find the invitation by ID
     const invite = await Invitation.findById(inviteId);
     if (!invite) {
@@ -187,8 +187,7 @@ const acceptInvite = asyncHandler(async (req, res) => {
     await document.save();
 
     // Step 6: Update the invitation status to accepted
-    invite.status = 'accepted';
-    await invite.save();
+    await invite.deleteOne()
 
     // Step 7: Send a success response
     return res.status(200).json(

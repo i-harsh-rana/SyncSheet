@@ -6,11 +6,16 @@ import { useForm } from 'react-hook-form';
 import Input from '../utils/Input';
 import { Link } from 'react-router-dom';
 import qs from 'qs';
+import { useSelector } from 'react-redux';
+import { GrUserAdmin } from "react-icons/gr";
+import { IoReaderOutline } from "react-icons/io5";
+import { CiEdit } from "react-icons/ci";
 
 function AllDocument() {
   const [createFrom, setCreateForm] = useState(false);
   const { register, handleSubmit, reset } = useForm();
   const queryClient = useQueryClient();
+  const currentUser = useSelector((state) => state.auth.userData);
 
   //get all docs using react query
   const { data: documents = [], isError, isLoading, error } = useQuery({
@@ -97,8 +102,9 @@ function AllDocument() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 1 }}
                 exit={{ scale: 1 }}
-                className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/40 flex items-center font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
-                {doc?.title || 'Untitled Document'}
+                className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/40 flex items-center justify-between font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
+                <span>{doc?.title || 'Untitled Document'}</span>
+                <span>{doc?.owner === currentUser._id ? <GrUserAdmin /> : doc.permissions.filter((perm)=>perm.userId === currentUser._id)[0].permission === 'read-write' ? <CiEdit/> : <IoReaderOutline/>}</span>
               </motion.div>
             </Link>
           ))}

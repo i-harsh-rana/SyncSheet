@@ -26,7 +26,7 @@ const invitationSchema = new Schema({
     },
     expiredAt: {
         type: Date,
-        default: () => Date.now() + 7 * 24 * 60 * 1000
+        default: () => new Date(Date.now() + 7 * 24 * 60 * 1000),
     },
 }, {timestamps: true})
 

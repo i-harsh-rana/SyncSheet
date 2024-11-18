@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   FiArrowRight,
-  FiBarChart2,
   FiChevronDown,
-  FiHome,
-  FiPieChart,
 } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -15,6 +12,10 @@ import { FiCheck } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
+import { LuUser } from "react-icons/lu";
+import { FaCode } from "react-icons/fa6";
 
 const HeaderMenu = () => {
   const [selected, setSelected] = useState(null);
@@ -212,26 +213,28 @@ const Products = () => {
 const Pricing = () => {
   return (
     <div className="grid grid-cols-3 gap-4 divide-x divide-neutral-700">
+      <Link to={'/allDocuments'}>
+        <div
+          className="flex w-full flex-col items-center justify-center py-2 text-main-text/90 hover:text-main-text active:text-main-text/80 transition-colors "
+        >
+          <IoDocumentTextOutline className="mb-2 text-xl text-golden" />
+          <span className="text-xs">All Docs</span>
+        </div>    
+      </Link>
+      <Link to={'/allDocuments'}>
+        <div
+          className="flex w-full flex-col items-center justify-center py-2 text-main-text/90 hover:text-main-text active:text-main-text/80 transition-colors "
+        >
+          <LuUser className="mb-2 text-xl text-golden" />
+          <span className="text-xs">Profile</span>
+        </div>    
+      </Link>
       <a
-        href="#"
-        className="flex w-full flex-col items-center justify-center py-2 text-neutral-400 transition-colors hover:text-neutral-50"
+        href="https://github.com/i-harsh-rana/SyncSheet" target='_blank' rel="noopener noreferrer"
+        className="flex w-full flex-col items-center justify-center py-2 text-main-text/90 hover:text-main-text active:text-main-text/80 transition-colors"
       >
-        <FiHome className="mb-2 text-xl text-indigo-300" />
-        <span className="text-xs">Startup</span>
-      </a>
-      <a
-        href="#"
-        className="flex w-full flex-col items-center justify-center py-2 text-neutral-400 transition-colors hover:text-neutral-50"
-      >
-        <FiBarChart2 className="mb-2 text-xl text-indigo-300" />
-        <span className="text-xs">Scaleup</span>
-      </a>
-      <a
-        href="#"
-        className="flex w-full flex-col items-center justify-center py-2 text-neutral-400 transition-colors hover:text-neutral-50"
-      >
-        <FiPieChart className="mb-2 text-xl text-indigo-300" />
-        <span className="text-xs">Enterprise</span>
+        <FaCode className="mb-2 text-xl text-golden" />
+        <span className="text-xs">Source Code</span>
       </a>
     </div>
   );
@@ -245,36 +248,42 @@ const Blog = () => {
     const {data: inviteData = [], isLoading, isError, error: inviteError} = useQuery({
         queryKey: ['invitations'],
         queryFn: async()=>{
-            const response = await axios.get(`/api/v1/invitation/allInvite`, {
-                withCredentials: true
-            })
-    
-            if(response.status===200){
-                return response.data?.data;
+            try {
+              const response = await axios.get(`/api/v1/invitation/allInvite`, {
+                  withCredentials: true
+              })
+      
+              if(response.status===200){
+                  return response.data?.data;
+              }
+  
+              throw new Error('Failed to fetch invitations');
+            } catch (error) {
+              console.log(error);
+              
             }
-
-            throw new Error('Failed to fetch invitations');
         }
       })
 
       const handleAcceptInvite = async(inviteId)=>{
-        const response = await axios.patch(`/api/v1/invitaion/${inviteId}`, {
+        const response = await axios.patch(`/api/v1/invitation/acceptInvite/${inviteId}`, {
             withCredentials: true
         })
 
         if(response.status===200){
             return response.data?.data;
         }
+        throw new Error('Failed to accept invitation');
       }
 
       const {mutate: mutateAccept} = useMutation({
         mutationFn: handleAcceptInvite,
         onSuccess: async(data)=>{
             setTimeout(() => {
-                navigate('/editor/:data._id');
+              navigate(`/editor/${data.documentId}`)
             }, 800);
             queryClient.setQueryData(['invitations'], (oldData) => {
-                return oldData.filter((oldInvite) => oldInvite._id !== data._id);
+                return oldData.filter((oldInvite) => oldInvite._id !== data.documentId);
             });
         }
       })
@@ -336,7 +345,7 @@ const Blog = () => {
                                             className="hover:bg-green-700/10 p-1 rounded-full hover:text-green-700 transition-colors duration-300">
                                                 <FiCheck />
                                             </div>
-                                            <div className="p-1 rounded-full hover:text-red-700 hover:bg-red-700/10">
+                                            <div className="p-1 rounded-full hover:text-red-700 hover:bg-red-700/10 transition-colors duration-300">
                                                 <RxCross2 />
                                             </div>
                                         </div>

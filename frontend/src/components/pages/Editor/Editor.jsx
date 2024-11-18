@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { motion } from 'framer-motion';
@@ -52,10 +52,10 @@ const Editor = () => {
 
   //setting content in quill
   useEffect(() => {
-    if (data && data.content) {
+    if (data && data.content && data.content !== content) {
       setContent(data.content);
     }
-  }, [data]);
+  }, [data?.content]);
 
   //scoket.io initialisation and functionality
   useEffect(() => {
@@ -95,10 +95,12 @@ const Editor = () => {
             const editor = editorRef.current.getEditor();
             
             // Only apply changes if they're newer than our last update
-            if (!lastUpdateRef.current || lastUpdateRef.current < Date.now() - 100) {
-              editor.updateContents(delta);
-              setContent(newContent);
-              console.log(`Changes made by: ${editorName}`);
+            if (!lastUpdateRef.current || Date.now() - lastUpdateRef.current > 10) {
+              requestAnimationFrame(() => {
+                editor.updateContents(delta);
+                setContent(newContent);
+              });
+              lastUpdateRef.current = Date.now();
             }
           }
         });
@@ -143,6 +145,12 @@ const Editor = () => {
     };
   }, [docID]);
 
+  const isReadWrite = useMemo(() => (
+    currentUser._id === data?.owner?._id || 
+    data?.permissions?.some((perm) => 
+      perm.userId._id === currentUser._id && perm.permission === 'read-write')
+  ), [currentUser._id, data?.owner?._id, data?.permissions]);
+
   // Debounce function to prevent too frequent updates
   const debounce = (func, wait) => {
     let timeout;
@@ -152,22 +160,36 @@ const Editor = () => {
     };
   };
 
-  const handleTextChange = debounce((value, delta, source) => {
-    if (source === 'user' && socketRef.current?.connected) {
+  const handleTextChange = useCallback(debounce((value, delta, source) => {
+    if (isReadWrite && source === 'user' && socketRef.current?.connected) {
       lastUpdateRef.current = Date.now();
-      
+  
+      const editor = editorRef.current?.getEditor();
+      const selection = editor.getSelection(true);
+  
+      // Save cursor position before applying the change
+      const currentPosition = selection ? selection.index : 0;
+  
       try {
         socketRef.current.emit('text-change', {
           documentId: docID,
           delta,
           userId: currentUser._id,
-          content: value
+          content: value,
         }, (acknowledgement) => {
           if (acknowledgement?.error) {
             setUpdateError(acknowledgement.error);
           } else {
             setContent(value);
             setUpdateError(null);
+  
+            // Apply delta after content update to avoid losing cursor position
+            editor.updateContents(delta);
+  
+            // Restore selection after update
+            if (selection) {
+              editor.setSelection(currentPosition, selection.length);
+            }
           }
         });
       } catch (err) {
@@ -175,7 +197,10 @@ const Editor = () => {
         setUpdateError('Failed to send update to server');
       }
     }
-  }, 100); // Debounce for 100ms
+  }, 300), [isReadWrite, docID, currentUser?._id]);
+  
+  
+  
 
   const handleDocDelete = async () => {
     setDeleleteStatus(true);
@@ -221,25 +246,44 @@ const Editor = () => {
     return null;
   };
 
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      ['blockquote', 'code-block'],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' },
-       { 'indent': '-1' }, { 'indent': '+1' }],
-      [{ 'direction': 'rtl' }, { 'align': [] }],
-      ['link', 'image', 'video'],
-      ['clean']
-    ],
+ 
+
+  const modules = useMemo(()=>({
+    toolbar: isReadWrite
+    ? [
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'font': [] }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'script': 'sub' }, { 'script': 'super' }],
+        ['blockquote', 'code-block'],
+        [
+          { 'list': 'ordered' },
+          { 'list': 'bullet' },
+          { 'indent': '-1' },
+          { 'indent': '+1' },
+        ],
+        [{ 'direction': 'rtl' }, { 'align': [] }],
+        ['link', 'image', 'video'],
+        ['clean'],
+      ]
+    : null,
     clipboard: {
       matchVisual: false,
     }
-  };
+  }), [isReadWrite])
+
+  const formats = useMemo(()=>([
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'script',
+    'blockquote', 'code-block',
+    'list', 'bullet', 'indent',
+    'direction', 'align',
+    'link', 'image', 'video'
+  ]))
 
   if(isLoading){
     return (
@@ -265,8 +309,8 @@ const Editor = () => {
         </div>
         <div className='flex space-x-3 p-5 items-center'>
           <div className='relative flex items-center space-x-6'>
-            <InviteButton docId={docID}/>
-            <AccessDropDown/>
+            {currentUser._id === data?.owner?._id && <InviteButton docId={data?._id}/>}
+            <AccessDropDown permissions={data?.permissions}/>
           </div>
           <img
             src={data?.owner?.avatar}
@@ -291,16 +335,8 @@ const Editor = () => {
         ref={editorRef}
         theme="snow"
         modules={modules}
-        formats={[
-          'header', 'font', 'size',
-          'bold', 'italic', 'underline', 'strike',
-          'color', 'background',
-          'script',
-          'blockquote', 'code-block',
-          'list', 'bullet', 'indent',
-          'direction', 'align',
-          'link', 'image', 'video'
-        ]}
+        formats={formats}
+        readOnly={!isReadWrite}
         value={content}
         onChange={handleTextChange}
         className="bg-white rounded-lg shadow-md editor-container"
@@ -320,6 +356,9 @@ const Editor = () => {
           justify-content: space-evenly;
           align-items: center;
           flex-wrap: wrap;
+          cursor: ${isReadWrite ? 'not-allowed' : 'text'};
+          user-select: ${isReadWrite ? 'none' : 'auto'};
+          pointer-events: ${isReadWrite ? 'none' : 'auto'};
         }
         .editor-container .ql-toolbar .ql-formats {
           display: flex;

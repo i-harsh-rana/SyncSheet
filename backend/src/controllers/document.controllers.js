@@ -33,7 +33,7 @@ const getDocuments = asyncHandler(async(req, res)=>{
     const documents = await Document.find({
         $or: [
           { owner: userId },
-          { 'permissions.userId': userId, 'permissions.permission': 'read-write' } 
+          { 'permissions.userId': userId, 'permissions.permission': { $in: ['read-write', 'read-only'] } } 
         ]
       });
      
@@ -48,7 +48,7 @@ const getDocumentByID = asyncHandler(async(req, res)=>{
     const {id} = req.params;
     const userId = req.user._id;
 
-    const document = await Document.findById(id).populate('owner', 'fullName email avatar').populate('permissions.userId', 'fullName email');
+    const document = await Document.findById(id).populate('owner', 'fullName email avatar').populate('permissions.userId', 'fullName username email');
 
     if(!document){
         throw new ApiError(404, 'No such document found');
@@ -59,7 +59,7 @@ const getDocumentByID = asyncHandler(async(req, res)=>{
     const isAllowedToAll = document.allowTOAll;
 
     const hasPermission = document.permissions.some(
-        (perm) => perm.userId._id.equals(userId) && perm.permission === 'read-write'
+        (perm) => perm.userId._id.equals(userId) 
     );
 
     if(!isOwner && !hasPermission && !isAllowedToAll){

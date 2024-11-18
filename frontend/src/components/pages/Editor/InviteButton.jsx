@@ -30,18 +30,17 @@ function InviteButton({docId}) {
         withCredentials: true
       })
       if(response.status === 200){
-        return response.data?.data;
-      }else{
-        console.log('Fail to fetch invites');
-        
+        return response.data?.data || []; 
       }
+      throw new Error('Failed to fetch invites');
     }
   })
 
-  useEffect(()=>{
-    if(data){
-      setPreviousInvites(data);
-    }
+    useEffect(() => {
+      // Only update if data is truthy and different from previous invites
+      if (data && JSON.stringify(data) !== JSON.stringify(previousInvites)) {
+        setPreviousInvites(data);
+      }
   }, [data])
 
   const handleInviteSend = async(formData)=>{
