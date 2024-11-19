@@ -7,10 +7,19 @@ import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
 import Editor from './components/pages/Editor/Editor.jsx';
 import AllDocument from './components/pages/AllDocument.jsx';
-
+import {GoogleOAuthProvider} from "@react-oauth/google";
 
 function App() {
   
+  const LoginWithGoogle = ()=>{
+    return (
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
+        <Login/>
+      </GoogleOAuthProvider>
+    )
+    
+  }
+
   return (
     <>
     <Router>
@@ -19,7 +28,7 @@ function App() {
       <div className='flex-grow'>
         <Routes>
           <Route path='/' element={<Home/>}/>
-          <Route path='/login' element={<Login/>}/>
+          <Route path='/login' element={<LoginWithGoogle/>}/>
           <Route path='/signup' element={<SignUp/>}/>
           <Route path='/editor/:docID' element={<Editor/>}/>
           <Route path='/allDocuments' element={<AllDocument/>}/>

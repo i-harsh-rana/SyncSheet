@@ -9,6 +9,9 @@ import jwt from 'jsonwebtoken'
 const generateRefreshAndAccessToken = async(userID)=>{
     try {
         const user = await User.findById(userID);
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
         const accessToken = user.generateAccessToken();
         const refreshToken  = user.generateRefreshToken();
 
@@ -215,5 +218,6 @@ export {
     userLogin,
     logoutUser,
     refreshAccessToken,
-    getCurrentUser
+    getCurrentUser,
+    generateRefreshAndAccessToken
 }

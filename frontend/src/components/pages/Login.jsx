@@ -12,6 +12,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux'
 import {login} from '../../store/authStore'
 import LoginSignupBtn from '../utils/LoginSignupBtn.jsx'
+import GoogleLoginSignup from './GoogleLoginSignup.jsx'
+
 
 const handleLogin = async (data)=>{
 
@@ -56,7 +58,6 @@ function Login() {
     }
   })
  
-  
   return (
     <div className='m-3 flex flex-col lg:flex-row text-main-text'>
       {/* Image Section */}
@@ -116,6 +117,7 @@ function Login() {
                 </div>
               </form>
             </div>
+            <GoogleLoginSignup/>
           </div>
         </div>
       </div>

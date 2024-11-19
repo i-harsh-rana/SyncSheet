@@ -92,7 +92,7 @@ function AllDocument() {
             exit={{ scale: 1 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setCreateForm(true)}
-            className='w-[15rem] h-[3rem] my-2 mx-2 border-[0.04rem] rounded-lg border-black/40 flex items-center font-light cursor-pointer'>
+            className='w-[15rem] h-[3rem] my-2 mx-2 border-[0.04rem] rounded-lg border-black/30 flex items-center font-light cursor-pointer bg-gradient-to-b from-bg-main via-bg-main to-white'>
             <i className="fa-solid fa-plus text-xl px-3"></i> Create New
           </motion.div>
           {documents && documents.length > 0 && documents.map((doc) => (
@@ -102,7 +102,7 @@ function AllDocument() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 1 }}
                 exit={{ scale: 1 }}
-                className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/40 flex items-center justify-between font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
+                className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/20 flex items-center justify-between font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
                 <span>{doc?.title || 'Untitled Document'}</span>
                 <span>{doc?.owner === currentUser._id ? <GrUserAdmin /> : doc.permissions.filter((perm)=>perm.userId === currentUser._id)[0].permission === 'read-write' ? <CiEdit/> : <IoReaderOutline/>}</span>
               </motion.div>
