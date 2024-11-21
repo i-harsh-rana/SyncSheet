@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {login} from '../../store/authStore.js'
+import GoogleLoginSignup from './GoogleLoginSignup.jsx'
 
 
 const handleSignup = async (data)=>{
@@ -162,6 +163,7 @@ function SignUp() {
                   </div>
                 </form>
               </div>
+              <GoogleLoginSignup/>
             </div>
           </div>
         </div>

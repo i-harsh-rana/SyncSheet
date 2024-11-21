@@ -20,6 +20,14 @@ function App() {
     
   }
 
+  const SignupWithGoogle = ()=>{
+    return (
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
+        <SignUp/>
+      </GoogleOAuthProvider>
+    )
+  }
+
   return (
     <>
     <Router>
@@ -29,7 +37,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Home/>}/>
           <Route path='/login' element={<LoginWithGoogle/>}/>
-          <Route path='/signup' element={<SignUp/>}/>
+          <Route path='/signup' element={<SignupWithGoogle/>}/>
           <Route path='/editor/:docID' element={<Editor/>}/>
           <Route path='/allDocuments' element={<AllDocument/>}/>
         </Routes>
