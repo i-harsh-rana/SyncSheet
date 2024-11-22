@@ -42,6 +42,15 @@ app.use('/api/v1/invitation', invitationRouter);
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
+  socket.on('join-room', ({ userId }) => {
+    if (!userId) {
+      console.log('No user ID provided, cannot join room.');
+      return;
+    }
+    socket.join(userId);
+    console.log(`User with ID ${userId} joined room.`);
+  });``
+
   // Join Document Room
   socket.on('joinDocument', (documentId) => {
     socket.join(documentId);
@@ -104,4 +113,4 @@ io.on('connection', (socket) => {
   });
 });
 
-export { app, server };
+export {io, app, server };

@@ -200,8 +200,6 @@ const Editor = () => {
   }, 300), [isReadWrite, docID, currentUser?._id]);
   
   
-  
-
   const handleDocDelete = async () => {
     setDeleleteStatus(true);
     try {
@@ -246,7 +244,6 @@ const Editor = () => {
     return null;
   };
 
- 
 
   const modules = useMemo(()=>({
     toolbar: isReadWrite

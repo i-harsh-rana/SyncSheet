@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { Document } from "../models/document.model.js";
 import { User } from "../models/user.model.js";
 import { Invitation } from "../models/invitation.model.js";
+import {io} from '../app.js'
 
 const sendInvite = asyncHandler(async (req, res) => {
     const { docId } = req.params;
@@ -59,6 +60,25 @@ const sendInvite = asyncHandler(async (req, res) => {
         invitedUserEmail: email,
         invitedUserName: userToInvite.fullName,
         permission: permission,
+    });
+
+    // Emit notifications to both inviter and invitee
+    io.to(userToInvite._id.toString()).emit('invite-notification', {
+        message: `${req.user.fullName} has invited you to the document with ${permission} access.`,
+        type: 'Invite',
+        documentId: docId,
+        inviteId: newInvite._id,
+        status: newInvite.status,
+        id: Date.now()
+    });
+
+    io.to(req.user._id.toString()).emit('invite-notification', {
+        message: `You have successfully sent an invitation to ${email} with ${permission} access.`,
+        type: 'Invite Sent',
+        documentId: docId,
+        inviteId: newInvite._id,
+        status: newInvite.status,
+        id: Date.now()
     });
 
     // Send response
@@ -188,6 +208,30 @@ const acceptInvite = asyncHandler(async (req, res) => {
 
     // Step 6: Update the invitation status to accepted
     await invite.deleteOne()
+
+    const user = await User.findOne({ email: userEmail }); // Find the user by email
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+   try {
+     io.to(document.owner.toString()).emit('invite-notification', {
+         message: `${user.fullName} has accepted your invitation to the document.`,
+         type: 'Invite Accepted',
+         documentId: document._id,
+         id: Date.now(),
+     });
+ 
+     io.to(userId.toString()).emit('invite-notification', {
+         message: `You have successfully accepted the invitation to the document.`,
+         type: 'Invite Confirmation',
+         documentId: document._id,
+         id: Date.now(),
+     });
+   } catch (error) {
+    console.log(error);
+    
+   }
 
     // Step 7: Send a success response
     return res.status(200).json(

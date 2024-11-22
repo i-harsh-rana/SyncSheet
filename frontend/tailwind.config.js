@@ -11,7 +11,7 @@ export default {
         'golden': '#E3A831',
         'light-golden': '#FAD623',
         'bg-main': '#F8F9FA'
-      }
+      },
     },
   },
   plugins: [],

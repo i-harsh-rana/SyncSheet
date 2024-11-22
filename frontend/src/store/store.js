@@ -9,23 +9,13 @@ const authPersistConfig = {
     storage,
 };
 
-const notificationPersistConfig = {
-    key: 'notifications',
-    storage,
-};
-
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
-const persistedNotificationReducer = persistReducer(notificationPersistConfig, notificationReducer);
 
 const store = configureStore({
     reducer: {
         auth: persistedAuthReducer,
-        notifications: persistedNotificationReducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: false, 
-        }),
+        notifications: notificationReducer,
+    }
 });
 
 export const persistor = persistStore(store);
