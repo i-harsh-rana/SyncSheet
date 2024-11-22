@@ -213,11 +213,32 @@ const getCurrentUser = asyncHandler(async(req, res)=>{
     )
 })
 
+const getUserById = asyncHandler(async(req, res)=>{
+    const {id} = req.params;
+
+    if(!id){
+        throw new ApiError(404, "Please provide a valid ID")
+    }
+
+    const user = await User.findById(id).select('-password -refreshToken');
+
+    if(!user){
+        throw new ApiError(404, "No such user found");
+    }
+
+    return res 
+    .status(200)
+    .json(
+        new ApiResponse(200, user, "Done!")
+    )
+})
+
 export {
     registerUser, 
     userLogin,
     logoutUser,
     refreshAccessToken,
     getCurrentUser,
-    generateRefreshAndAccessToken
+    generateRefreshAndAccessToken,
+    getUserById
 }

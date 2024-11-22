@@ -210,7 +210,7 @@ const Products = () => {
   );
 };
 
-const Pricing = () => {
+const Navigation = () => {
   return (
     <div className="grid grid-cols-3 gap-4 divide-x divide-neutral-700">
       <Link to={'/allDocuments'}>
@@ -240,7 +240,7 @@ const Pricing = () => {
   );
 };
 
-const Blog = () => {
+const Invitation = () => {
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -369,12 +369,12 @@ const TABS = [
     Component: Products,
   },
   {
-    title: "Pricing",
-    Component: Pricing,
+    title: "Navigation",
+    Component: Navigation,
   },
   {
     title: "Invitations",
-    Component: Blog,
+    Component: Invitation,
   },
 ].map((n, idx) => ({ ...n, id: idx + 1 }));
 
