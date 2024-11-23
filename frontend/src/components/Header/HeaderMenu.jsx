@@ -16,6 +16,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { LuUser } from "react-icons/lu";
 import { FaCode } from "react-icons/fa6";
+import { useSelector } from "react-redux";
 
 const HeaderMenu = () => {
   const [selected, setSelected] = useState(null);
@@ -211,6 +212,7 @@ const Products = () => {
 };
 
 const Navigation = () => {
+  const userData = useSelector((state)=>state.auth.userData);
   return (
     <div className="grid grid-cols-3 gap-4 divide-x divide-neutral-700">
       <Link to={'/allDocuments'}>
@@ -221,7 +223,7 @@ const Navigation = () => {
           <span className="text-xs">All Docs</span>
         </div>    
       </Link>
-      <Link to={'/allDocuments'}>
+      <Link to={`/profile/${userData?._id}`}>
         <div
           className="flex w-full flex-col items-center justify-center py-2 text-main-text/90 hover:text-main-text active:text-main-text/80 transition-colors "
         >

@@ -6,8 +6,12 @@ import {
   import { useState } from "react";
   import { IoReaderOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
+import { RxCross2 } from "react-icons/rx";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+
   
-  const AccessDropDown = ({permissions}) => {
+  const AccessDropDown = ({permissions, owner, docId}) => {
     const [open, setOpen] = useState(false);
   
     return (
@@ -27,11 +31,11 @@ import { CiEdit } from "react-icons/ci";
             initial={wrapperVariants.closed}
             variants={wrapperVariants}
             style={{ originY: "top", translateX: "-50%" }}
-            className="flex flex-col gap-2 p-2 rounded-lg bg-white shadow-xl absolute top-[120%] left-[50%] w-40 overflow-hidden"
+            className="flex flex-col gap-2 p-2 rounded-lg bg-white shadow-xl absolute top-[120%] left-[50%] w-52 overflow-hidden"
           >
             {
               permissions?.length > 0 ? permissions.map((perm)=>(
-                <Option key={perm._id} setOpen={setOpen} Icon={FiAtSign} text={perm.userId.username} isReadOnly={perm.permission === 'ready-only'}/>
+                <Option key={perm._id} setOpen={setOpen} Icon={FiAtSign} text={perm.userId.username} isReadOnly={perm.permission === 'ready-only'} isowner={owner} userId={perm.userId._id} docIDD={docId}/>
               )) : (
                 <motion.div 
                 initial={{ scale: 0.2 }}
@@ -48,18 +52,60 @@ import { CiEdit } from "react-icons/ci";
     );
   };
   
-  const Option = ({ text, Icon, setOpen, isReadOnly }) => {
+  const Option = ({ text, Icon, isReadOnly, isowner, userId, docIDD }) => {
+    const queryClient = useQueryClient();
+
+    const handleRemoveAccess = async ({ usID, doID }) => {
+      try {
+        const response = await axios.patch(
+          `/api/v1/document/removeAccess/${usID}/${doID}`,
+          {},
+          { withCredentials: true }
+        );
+    
+        if (response.status === 200) {
+          return response.data?.data; 
+        } else {
+          console.error(`Unexpected response status: ${response.status}`);
+          throw new Error("Failed to remove access.");
+        }
+      } catch (error) {
+        console.error("Error while removing access:", error.message);
+        throw error; 
+      }
+    };
+
+    const { mutate } = useMutation({
+      mutationFn: handleRemoveAccess,
+      onSuccess: (data) => {
+        
+        queryClient.setQueryData([`/editor/${data.docIDD}`], (oldData) => {
+          if (!oldData) return oldData;
+          const updatedPermissions = oldData.permissions.filter(
+            (perm) => perm.userId._id !== data.userId 
+          );
+
+          return {
+            ...oldData,
+            permissions: updatedPermissions,
+          };
+        });
+      },
+      onError: (error) => {
+        console.error("Error during mutation:", error.message);
+      },
+    });
     return (
       <motion.li
         variants={itemVariants}
-        onClick={() => setOpen(false)}
-        className="flex items-center gap-2 w-full p-2 px-3 text-xs font-medium whitespace-nowrap rounded-md hover:bg-indigo-100 text-slate-700 hover:text-indigo-500 transition-colors cursor-pointer"
+        className="flex items-center gap-2 w-full p-2 px-3 text-xs font-medium whitespace-nowrap rounded-md hover:bg-golden/10 text-slate-700 hover:text-golden transition-colors cursor-pointer"
       >
         <motion.span variants={actionIconVariants} className="w-[10%]">
           <Icon />
         </motion.span>
         <span className="w-[80%] truncate">{text}</span>
         <span className="w-[10%]">{isReadOnly ? <IoReaderOutline/> : <CiEdit/>}</span>
+        {isowner && <button className="hover:text-red-500 active:text-red-700 p-[0.12rem]" onClick={()=>{mutate({ usID: userId, doID: docIDD })}}> <RxCross2 /> </button>}
       </motion.li>
     );
   };

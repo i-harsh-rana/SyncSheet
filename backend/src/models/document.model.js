@@ -22,7 +22,8 @@ const documentSchema = new Schema({
     permissions: [{
         userId: {
             type: Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            unique: true
         },
         permission: {
             type: String,

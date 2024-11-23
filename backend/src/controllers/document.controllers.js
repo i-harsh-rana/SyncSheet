@@ -224,6 +224,52 @@ const toogleAllowToAll = asyncHandler(async(req, res)=>{
     )
 })
 
+const removeAccess = asyncHandler(async(req, res)=>{
+    const {userId, docId} = req.params;
+    
+    if(!userId){
+        throw new ApiError(404, "Please provide userId");
+    }
+
+    if(!docId){
+        throw new ApiError(404, "Please provide docId")
+    }
+    
+
+    const document = await Document.findById(docId);
+
+
+
+    if(!document){
+        throw new ApiError(404, "Such doc is not peresent");
+    }
+
+    if (document.owner.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "You do not have permission to remove access.");
+    }
+   
+    
+
+    const userIndex = document.permissions.findIndex(
+        (permission) => permission.userId.toString() === userId
+    );
+    
+    if (userIndex === -1) {
+     throw new ApiError(400, "User does not have permissions for this document.");
+    }
+
+    document.permissions.splice(userIndex, 1);
+
+    await document.save();
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, {userId}, "Done!")
+    )
+
+})
+
 export {
     createDocument,
     getDocuments,
@@ -232,5 +278,6 @@ export {
     shareDocument,
     deleteDocument,
     revertToVersion,
-    toogleAllowToAll
+    toogleAllowToAll,
+    removeAccess
 }

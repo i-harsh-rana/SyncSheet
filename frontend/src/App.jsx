@@ -8,7 +8,7 @@ import SignUp from './components/pages/SignUp';
 import Editor from './components/pages/Editor/Editor.jsx';
 import AllDocument from './components/pages/AllDocument.jsx';
 import {GoogleOAuthProvider} from "@react-oauth/google";
-import Profiile from './components/pages/Editor/Profiile.jsx';
+import Profile from './components/pages/Profile/Profile.jsx';
 
 function App() {
   
@@ -41,7 +41,7 @@ function App() {
           <Route path='/signup' element={<SignupWithGoogle/>}/>
           <Route path='/editor/:docID' element={<Editor/>}/>
           <Route path='/allDocuments' element={<AllDocument/>}/>
-          <Route path='/profile/:userId' element={<Profiile/>}/>
+          <Route path='/profile/:userId' element={<Profile/>}/>
         </Routes>
       </div>
       <Footer/>

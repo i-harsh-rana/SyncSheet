@@ -12,6 +12,7 @@ import { useRef, forwardRef } from 'react';
 import DocPermission from './DocPermission';
 import AccessDropDown from './AccessDropDown'
 import InviteButton from './InviteButton';
+import {Link} from 'react-router-dom'
 
 //custom quill editor
 const CustomQuill = forwardRef((props, ref) => (
@@ -300,6 +301,8 @@ const Editor = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4">
+      {console.log(data)
+      }
       <div className="font-light flex items-center justify-between">
         <div className='text-2xl font-extralight pl-3'>
           {data?.title}
@@ -307,21 +310,24 @@ const Editor = () => {
         <div className='flex space-x-3 p-5 items-center'>
           <div className='relative flex items-center space-x-6'>
             {currentUser._id === data?.owner?._id && <InviteButton docId={data?._id}/>}
-            <AccessDropDown permissions={data?.permissions}/>
+            <AccessDropDown permissions={data?.permissions} owner={currentUser._id === data?.owner?._id} docId={docID}/>
           </div>
-          <img
-            src={data?.owner?.avatar}
-            alt={`${data?.owner?.fullName}'s avatar`}
-            className="w-10 h-10 rounded-full object-cover shadow-inner"
-          />
-          <div className='pr-4'>
-            <div className="text-gray-800">
-              @{data?.owner?.fullName}
+          <Link to={`/profile/${data?.owner._id}`} className='flex'>
+            <img
+              src={data?.owner?.avatar}
+              alt={`${data?.owner?.fullName}'s avatar`}
+              className="w-10 h-10 rounded-full object-cover shadow-inner mr-2"
+            />
+            <div className='pr-4'>
+              <div className="text-gray-800">
+                @{data?.owner?.fullName}
+              </div>
+              <div className="text-gray-500 text-xs">
+                {data?.createdAt.slice(0, 10)}
+              </div>
             </div>
-            <div className="text-gray-500 text-xs">
-              {data?.createdAt.slice(0, 10)}
-            </div>
-          </div>
+          </Link>
+          
           <div>
             <i className="fa-regular fa-trash-can text-xl p-1 opacity-70 hover:text-red-500 active:text-red-700" onClick={()=>setdeleteConf(true)}></i>
           </div>
