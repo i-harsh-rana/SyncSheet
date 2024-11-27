@@ -10,6 +10,8 @@ import { CiEdit } from "react-icons/ci";
 import qs from 'qs';
 import { FcCancel } from "react-icons/fc";
 import axios from 'axios';
+import Errorr from '../../utils/Error';
+import LoadingCircular from '../../utils/Loading/LoadingCircular';
 
 function InviteButton({docId}) {
   const [inviteWindow, setInviteWindow] = useState(false);
@@ -101,11 +103,11 @@ function InviteButton({docId}) {
   })
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingCircular/>
   }
 
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return <Errorr message={error.message}/>
   }
 
   return (

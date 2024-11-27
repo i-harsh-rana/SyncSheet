@@ -9,6 +9,8 @@ import Editor from './components/pages/Editor/Editor.jsx';
 import AllDocument from './components/pages/AllDocument.jsx';
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import Profile from './components/pages/Profile/Profile.jsx';
+import AuthLayout from './components/auth/AuthLayout.jsx'
+import PageNotFound from './components/pages/PageNotFound/PageNotFound.jsx';
 
 function App() {
   
@@ -39,9 +41,10 @@ function App() {
           <Route path='/' element={<Home/>}/>
           <Route path='/login' element={<LoginWithGoogle/>}/>
           <Route path='/signup' element={<SignupWithGoogle/>}/>
-          <Route path='/editor/:docID' element={<Editor/>}/>
-          <Route path='/allDocuments' element={<AllDocument/>}/>
-          <Route path='/profile/:userId' element={<Profile/>}/>
+          <Route path='/editor/:docID' element={<AuthLayout><Editor/></AuthLayout>}/>
+          <Route path='/allDocuments' element={<AuthLayout><AllDocument/></AuthLayout>}/>
+          <Route path='/profile/:userId' element={<AuthLayout><Profile/></AuthLayout>}/>
+          <Route path='/*' element={<PageNotFound/>}/>
         </Routes>
       </div>
       <Footer/>

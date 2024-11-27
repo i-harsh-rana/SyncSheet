@@ -35,7 +35,7 @@ const getDocuments = asyncHandler(async(req, res)=>{
           { owner: userId },
           { 'permissions.userId': userId, 'permissions.permission': { $in: ['read-write', 'read-only'] } } 
         ]
-      });
+      }).populate('owner', 'fullName username');
      
     return res
     .status(200)
@@ -224,51 +224,48 @@ const toogleAllowToAll = asyncHandler(async(req, res)=>{
     )
 })
 
-const removeAccess = asyncHandler(async(req, res)=>{
-    const {userId, docId} = req.params;
-    
-    if(!userId){
+const removeAccess = asyncHandler(async (req, res) => {
+    const { userId, docId } = req.params;
+
+    if (!userId) {
         throw new ApiError(404, "Please provide userId");
     }
 
-    if(!docId){
-        throw new ApiError(404, "Please provide docId")
+    if (!docId) {
+        throw new ApiError(404, "Please provide docId");
     }
-    
 
     const document = await Document.findById(docId);
 
-
-
-    if(!document){
-        throw new ApiError(404, "Such doc is not peresent");
+    if (!document) {
+        throw new ApiError(404, "Such doc is not present");
     }
 
     if (document.owner.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "You do not have permission to remove access.");
+        throw new ApiError(403, "You do not have permission to remove access.");
     }
-   
-    
 
     const userIndex = document.permissions.findIndex(
         (permission) => permission.userId.toString() === userId
     );
-    
+
     if (userIndex === -1) {
-     throw new ApiError(400, "User does not have permissions for this document.");
+        throw new ApiError(400, "User does not have permissions for this document.");
     }
 
+    // Store the permission being removed
+    const removedPermission = document.permissions[userIndex];
+
+    // Remove the permission from the array
     document.permissions.splice(userIndex, 1);
 
     await document.save();
 
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(200, {userId}, "Done!")
-    )
+    return res.status(200).json(
+        new ApiResponse(200, { userId, permissionId: removedPermission._id }, "Done!")
+    );
+});
 
-})
 
 export {
     createDocument,

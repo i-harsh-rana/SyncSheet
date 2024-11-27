@@ -13,6 +13,8 @@ import DocPermission from './DocPermission';
 import AccessDropDown from './AccessDropDown'
 import InviteButton from './InviteButton';
 import {Link} from 'react-router-dom'
+import Errorr from '../../utils/Error';
+import LoadingCircular from '../../utils/Loading/LoadingCircular';
 
 //custom quill editor
 const CustomQuill = forwardRef((props, ref) => (
@@ -284,19 +286,11 @@ const Editor = () => {
   ]))
 
   if(isLoading){
-    return (
-      <>
-        Loading...
-      </>
-    )
+    return <LoadingCircular/>
   }
 
   if(isError){
-    return (
-      <>
-        {error}
-      </>
-    )
+    return <Errorr message={error.message}/>
   }
 
   return (

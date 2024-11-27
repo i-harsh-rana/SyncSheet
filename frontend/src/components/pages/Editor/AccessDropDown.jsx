@@ -79,10 +79,10 @@ import axios from "axios";
       mutationFn: handleRemoveAccess,
       onSuccess: (data) => {
         
-        queryClient.setQueryData([`/editor/${data.docIDD}`], (oldData) => {
+        queryClient.setQueryData([`/editor/${docIDD}`], (oldData) => {
           if (!oldData) return oldData;
           const updatedPermissions = oldData.permissions.filter(
-            (perm) => perm.userId._id !== data.userId 
+            (perm) => perm._id !== data.permissionId
           );
 
           return {

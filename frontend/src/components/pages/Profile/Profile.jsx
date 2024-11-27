@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios';
 import timeCalculator from '../../utils/timeCalculator';
 import { motion, AnimatePresence } from 'framer-motion';
+import Error from '../../utils/Error';
+import LoadingCircular from '../../utils/Loading/LoadingCircular';
 
 function Profile() {
     const {userId} = useParams();
@@ -30,24 +32,19 @@ function Profile() {
 
     if(isLoading){
         return (
-          <>
-            Loading...
-          </>
+          <LoadingCircular/>
         )
       }
     
       if(isError){
         return (
-          <>
-            {error.message}
-          </>
+          <Error message={error.message}/>
         )
       }
 
   return (
     <div className="w-full h-full flex justify-center items-center p-7 text-main-text font-light overflow-hidden"> 
-      <div className='group p-[0.1rem] flex relative rounded-[0.9rem] shadow-lg overflow-hidden border-[0.07rem] '>
-        <div className=" bg-white  p-9 rounded-xl relative w-[25rem]  h-auto space-y-4 flex flex-col items-center z-10">
+        <div className=" bg-white  p-9 rounded-xl relative w-[25rem]  h-auto space-y-4 flex flex-col items-center z-10 border-golden border-[0.07rem] shadow-lg">
                <div onClick={() => setAvatarModalOpen(true)} className=' cursor-pointer'>
                 <motion.img 
                   initial={{ scale: 0 }}
@@ -71,11 +68,7 @@ function Profile() {
                 </motion.div>
                 
         </div>
-                <span className="absolute left-0 top-0 h-[5px] w-0 bg-golden transition-all duration-100 group-hover:w-full"></span>
-                <span className="absolute right-0 top-0 h-0 w-[5px] bg-golden transition-all delay-100 duration-100 group-hover:h-full"></span>
-                <span className="absolute bottom-0 right-0 h-[5px] w-0 bg-golden transition-all delay-200 duration-100 group-hover:w-full"></span>
-                <span className="absolute bottom-0 left-0 h-0 w-[5px] bg-golden transition-all delay-300 duration-100 group-hover:h-full"></span>
-      </div>
+                
       <AnimatePresence>
           {avatarModalOpen && (
               <motion.div 

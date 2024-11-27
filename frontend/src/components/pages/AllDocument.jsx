@@ -10,9 +10,12 @@ import { useSelector } from 'react-redux';
 import { GrUserAdmin } from "react-icons/gr";
 import { IoReaderOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
+import LoadingCircular from '../utils/Loading/LoadingCircular';
+import Error from '../utils/Error';
 
 function AllDocument() {
   const [createFrom, setCreateForm] = useState(false);
+  const [searchTitle, setSearchTitle] = useState('');
   const { register, handleSubmit, reset } = useForm();
   const queryClient = useQueryClient();
   const currentUser = useSelector((state) => state.auth.userData);
@@ -71,20 +74,58 @@ function AllDocument() {
     }
   });
 
+  const getDocumentAccessIcon = (doc, userId) => {
+    if (!doc || !userId) return <IoReaderOutline />;
+
+    // Check if user is owner
+    if (doc?.owner?._id === userId) {
+      return <GrUserAdmin />;
+    }
+
+    // Check user permissions
+    try {
+      const userPermission = doc.permissions?.find(perm => perm?.userId === userId);
+      if (userPermission?.permission === 'read-write') {
+        return <CiEdit />;
+      }
+    } catch (error) {
+      console.error('Error checking permissions:', error);
+    }
+
+    // Default to read-only
+    return <IoReaderOutline />;
+  };
+
+  // Filter documents based on title search
+  const filteredDocuments = documents.filter(doc => {
+    const docTitle = doc?.title?.toLowerCase() || 'untitled document';
+    return docTitle.includes(searchTitle.toLowerCase());
+  });
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingCircular w={400} h={400}/>
   }
 
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return <Error message={error.message}/>
   }
 
   return (
     <div className='text-main-text flex justify-center p-7'>
-      <div className='w-[70rem]'>
-        <h3 className='text-2xl font-extralight'>
+      <div className='w-[65rem]'>
+        <h3 className='text-2xl font-extralight mb-4'>
           All Documents:
         </h3>
+        <div className="relative mb-6">
+          <i className="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input
+            type="text"
+            placeholder="Search by title..."
+            value={searchTitle}
+            onChange={(e) => setSearchTitle(e.target.value)}
+            className=" pl-10 w-full pr-4 py-2 border border-black/30 rounded-lg focus:outline-none focus:border-[#b8860b]"
+          />
+        </div>
         <div className='flex flex-wrap my-7'>
           <motion.div
             initial={{ scale: 1 }}
@@ -92,22 +133,40 @@ function AllDocument() {
             exit={{ scale: 1 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setCreateForm(true)}
-            className='w-[15rem] h-[3rem] my-2 mx-2 border-[0.04rem] rounded-lg border-black/30 flex items-center font-light cursor-pointer bg-gradient-to-b from-bg-main via-bg-main to-white'>
-            <i className="fa-solid fa-plus text-xl px-3"></i> Create New
+            className='w-[15rem] h-[4rem] my-2 mx-2 border-[0.04rem] rounded-lg text-base border-black/30 flex items-center font-light cursor-pointer bg-gradient-to-b from-bg-main via-bg-main to-white'>
+            <i className="fa-solid fa-plus px-3 ml-2"></i> Create New
           </motion.div>
-          {documents && documents.length > 0 && documents.map((doc) => (
+          {filteredDocuments.map((doc) => (
             <Link key={doc?._id} to={`/editor/${doc?._id}`}>
               <motion.div
                 initial={{ scale: 1 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05}}
                 whileTap={{ scale: 1 }}
                 exit={{ scale: 1 }}
-                className='w-[15rem] h-[3rem] border-[0.01rem] rounded-lg border-black/20 flex items-center justify-between font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
-                <span>{doc?.title || 'Untitled Document'}</span>
-                <span>{doc?.owner === currentUser._id ? <GrUserAdmin /> : doc.permissions.filter((perm)=>perm.userId === currentUser._id)[0].permission === 'read-write' ? <CiEdit/> : <IoReaderOutline/>}</span>
+                className='w-[15rem] h-[4rem] border-[0.01rem] relative rounded-lg border-black/20 flex items-center justify-between font-light text-main-text my-2 mx-2 p-4 overflow-hidden text-sm'>
+                {!doc ? (
+                    <span className="animate-pulse">Loading...</span>
+                ) : (
+                    <>
+                        <div className='mx-1'>
+                            <div className="truncate w-full" title={doc?.title || 'Untitled Document'}>
+                                {doc?.title || 'Untitled Document'}
+                            </div>
+                            <div className="truncate w-full text-[0.6rem] opacity-70" title={doc?.owner.username}>
+                               @ {doc?.owner.username}
+                            </div>
+                        </div>
+                        <span>{getDocumentAccessIcon(doc, currentUser?._id)}</span>
+                    </>
+                )}
               </motion.div>
             </Link>
           ))}
+          {filteredDocuments.length === 0 && searchTitle && (
+            <div className="w-full text-center text-gray-500 mt-4">
+              No documents found with title matching "{searchTitle}"
+            </div>
+          )}
         </div>
       </div>
       <AnimatePresence>

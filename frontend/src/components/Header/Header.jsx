@@ -6,20 +6,16 @@ import { useSelector, } from 'react-redux'
 
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
-
-  
-
-
+ 
   return (
-    <div className='border-b-2 p-2 flex justify-between'>
+    <div className='border-b-2 px-4 flex py-3 justify-between'>
       <Logo/>
       { 
         authStatus && 
-          <>
-          <HeaderMenu/>
-          <LogoutBtn/>
-          
-          </>
+        <div className='flex items-center font-light'>
+        <HeaderMenu/>
+        <LogoutBtn/>
+        .</div>
       }
       
     </div>

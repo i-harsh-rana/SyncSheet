@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  FiArrowRight,
   FiChevronDown,
 } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +16,7 @@ import { Link } from "react-router-dom";
 import { LuUser } from "react-icons/lu";
 import { FaCode } from "react-icons/fa6";
 import { useSelector } from "react-redux";
+import { MdOutlineEngineering } from "react-icons/md";
 
 const HeaderMenu = () => {
   const [selected, setSelected] = useState(null);
@@ -35,7 +35,7 @@ const HeaderMenu = () => {
   return (
     <div
       onClick={()=>(selected != null && setSelected(null))}
-      className="relative flex h-fit gap-2"
+      className="relative flex h-fit gap-2 mr-3"
     >
       {TABS.map((t) => {
         return (
@@ -95,7 +95,7 @@ const Content = ({ selected, dir }) => {
         opacity: 0,
         y: 8,
       }}
-      className="absolute left-0 top-[calc(100%_+_24px)] w-96 rounded-lg border-[0.07rem] border-golden/40 bg-gradient-to-b from-bg-main via-bg-main to-white p-3 z-20"
+      className="absolute right-0 top-[calc(100%_+_24px)] w-[22rem] rounded-lg border-[0.07rem] border-golden/40 bg-gradient-to-b from-bg-main via-bg-main to-white p-3 z-30"
     >
       <Bridge />
       <Nub selected={selected} />
@@ -161,56 +161,6 @@ const Nub = ({ selected }) => {
   );
 };
 
-const Products = () => {
-  return (
-    <div>
-      <div className="flex gap-4">
-        <div>
-          <h3 className="mb-2 text-sm font-medium">Startup</h3>
-          <a href="#" className="mb-1 block text-sm text-neutral-400">
-            Bookkeeping
-          </a>
-          <a href="#" className="block text-sm text-neutral-400">
-            Invoicing
-          </a>
-        </div>
-        <div>
-          <h3 className="mb-2 text-sm font-medium">Scaleup</h3>
-          <a href="#" className="mb-1 block text-sm text-neutral-400">
-            Live Coaching
-          </a>
-          <a href="#" className="mb-1 block text-sm text-neutral-400">
-            Reviews
-          </a>
-          <a href="#" className="block text-sm text-neutral-400">
-            Tax/VAT
-          </a>
-        </div>
-        <div>
-          <h3 className="mb-2 text-sm font-medium">Enterprise</h3>
-          <a href="#" className="mb-1 block text-sm text-neutral-400">
-            White glove
-          </a>
-          <a href="#" className="mb-1 block text-sm text-neutral-400">
-            SOX Compliance
-          </a>
-          <a href="#" className="block text-sm text-neutral-400">
-            Staffing
-          </a>
-          <a href="#" className="block text-sm text-neutral-400">
-            More
-          </a>
-        </div>
-      </div>
-
-      <button className="ml-auto mt-4 flex items-center gap-1 text-sm text-indigo-300">
-        <span>View more</span>
-        <FiArrowRight />
-      </button>
-    </div>
-  );
-};
-
 const Navigation = () => {
   const userData = useSelector((state)=>state.auth.userData);
   return (
@@ -228,15 +178,15 @@ const Navigation = () => {
           className="flex w-full flex-col items-center justify-center py-2 text-main-text/90 hover:text-main-text active:text-main-text/80 transition-colors "
         >
           <LuUser className="mb-2 text-xl text-golden" />
-          <span className="text-xs">Profile</span>
+          <span className="text-xs truncate">{userData.username}</span>
         </div>    
       </Link>
       <a
-        href="https://github.com/i-harsh-rana/SyncSheet" target='_blank' rel="noopener noreferrer"
+        href="https://harshrana.in" target='_blank' rel="noopener noreferrer"
         className="flex w-full flex-col items-center justify-center py-2 text-main-text/90 hover:text-main-text active:text-main-text/80 transition-colors"
       >
-        <FaCode className="mb-2 text-xl text-golden" />
-        <span className="text-xs">Source Code</span>
+        <MdOutlineEngineering className="mb-2 text-2xl text-golden" />
+        <span className="text-xs">Developer</span>
       </a>
     </div>
   );
@@ -366,10 +316,6 @@ const Invitation = () => {
 };
 
 const TABS = [
-  {
-    title: "Products",
-    Component: Products,
-  },
   {
     title: "Navigation",
     Component: Navigation,
