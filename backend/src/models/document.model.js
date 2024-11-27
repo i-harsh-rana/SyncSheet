@@ -29,24 +29,6 @@ const documentSchema = new Schema({
             type: String,
             enum: ['read-only', 'read-write']
         }
-    }],
-    version: [{
-        versionNumber:{
-            type: Number,
-            required: true
-        },
-        content:{
-            type: Schema.Types.Mixed,
-            required: true
-        },
-        timestamp:{
-            type: Date,
-            default: Date.now
-        },
-        editedBy: {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        }
     }]
 },{timestamps: true})
 

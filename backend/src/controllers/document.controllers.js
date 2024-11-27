@@ -12,11 +12,6 @@ const createDocument = asyncHandler(async(req, res)=>{
             content: req.body.content || '',
             owner: userId,
             permissions: [],
-            version: [{
-                versionNumber: 1,
-                content: req.body.content || ' ',
-                editedBy: userId
-            }]
         })
 
         const savedDoc = await newDoc.save();
@@ -94,11 +89,6 @@ const updateDocument = asyncHandler(async(req, res)=>{
     }
 
     document.content = content;
-    document.version.push({
-        versionNumber: document.version.length+1,
-        content: content,
-        editedBy: userId
-    });
 
     await document.save();
 
@@ -168,62 +158,6 @@ const deleteDocument = asyncHandler(async(req, res)=>{
     )
 })
 
-const revertToVersion = asyncHandler(async(req, res)=>{
-    const { id, versionNumber } = req.params;
-    const userId = req.user.id;
-
-    const document = await Document.findById(id);
-
-    if (!document) {
-        throw new ApiError(404, "Not Found")
-    }
-
-    const isOwner = document.owner.equals(userId);
-    const hasPermission = document.permissions.some(
-      (perm) => perm.userId.equals(userId) && perm.permission === 'read-write'
-    );
-
-    if(!isOwner && !hasPermission){
-        throw new ApiError(403, 'Access Denied');
-    }
-
-    const version = document.version.find(v => v.versionNumber === parseInt(versionNumber));
-
-    if(!version){
-        throw new ApiError(404, "Verion not found"); 
-    }
-
-    document.content = version.content;
-    await document.save();
-
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(200, document, 'Reverted')
-    );
-})
-
-const toogleAllowToAll = asyncHandler(async(req, res)=>{
-    const {id} = req.params;
-
-    const document = await Document.findById(id);
-
-    if(!document){
-        throw new ApiError(404, 'No Such Document found');
-    }
-
-    document.allowTOAll = !document.allowTOAll;
-    await document.save({ validateBeforeSave: false });
-
-    const currectStatus = document.allowTOAll;
-
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(200, currectStatus, 'toggle successfull')
-    )
-})
-
 const removeAccess = asyncHandler(async (req, res) => {
     const { userId, docId } = req.params;
 
@@ -274,7 +208,5 @@ export {
     updateDocument,
     shareDocument,
     deleteDocument,
-    revertToVersion,
-    toogleAllowToAll,
     removeAccess
 }

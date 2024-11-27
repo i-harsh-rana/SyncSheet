@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createDocument, deleteDocument, getDocumentByID, getDocuments, removeAccess, revertToVersion, shareDocument, toogleAllowToAll, updateDocument } from "../controllers/document.controllers.js";
+import { createDocument, deleteDocument, getDocumentByID, getDocuments, removeAccess, shareDocument, updateDocument } from "../controllers/document.controllers.js";
 
 const router = Router();
 
@@ -17,10 +17,6 @@ router.route('/shareDoc').post(shareDocument);
 router.route('/updateDoc').put(updateDocument);
 
 router.route('/deleteDoc/:id').delete(deleteDocument);
-
-router.route('/undoDoc').post(revertToVersion);
-
-router.route('/toggleAllowAll/:id').put(toogleAllowToAll);
 
 router.route('/removeAccess/:userId/:docId').patch(removeAccess);
 

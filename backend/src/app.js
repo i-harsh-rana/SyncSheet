@@ -77,13 +77,7 @@ io.on('connection', (socket) => {
 
       // Update document content and add version history
       document.content = content;
-      document.version.push({
-        versionNumber: document.version.length + 1,
-        content: delta,
-        editedBy: userId,
-        timestamp: new Date(),
-      });
-
+  
       await document.save();
 
       // Get editor's name
