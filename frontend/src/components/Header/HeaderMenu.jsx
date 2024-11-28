@@ -240,6 +240,24 @@ const Invitation = () => {
         }
       })
 
+      const handleRejectInvite = async({inviteID, ownerId})=>{
+        const response = await axios.delete(`/api/v1/invitation/rejectInvite/${ownerId}/${inviteID}`, {withCredentials: true});
+
+        if(response.status===200){
+          return response.data?.data;
+        }
+        throw new Error('Failed to reject invitation');
+      }
+
+      const {mutate: mutateReject} = useMutation({
+        mutationFn: handleRejectInvite,
+        onSuccess: async(data)=>{
+          queryClient.setQueriesData(['invitations'], (oldData=[])=>{
+            return oldData.filter((old)=> old._id !== data.inviteId);
+          })
+        }
+      })
+
       if (isLoading) {
         return <p>Loading...</p>;
       }
@@ -250,7 +268,7 @@ const Invitation = () => {
   return (
     <div>
       {
-        inviteData.length <= 0 ? (
+        inviteData?.length <= 0 ? (
             <>
                 <div className="font-light text-main-text/70 text-center text-sm">
                     Empty !
@@ -274,7 +292,7 @@ const Invitation = () => {
                      </p>
                   </div>
                     {
-                        inviteData.map((invite)=>(
+                        inviteData?.map((invite)=>(
                             <div key={invite?._id} className="text-sm  p-2  ">
                                 <div className="border-[0.07rem] border-bg-main p-2 hover:border-golden/40 transform transition-all duration-300 flex items-center rounded-lg font-extralight">
                                     
@@ -293,11 +311,13 @@ const Invitation = () => {
                                     <div className="w-[22%] px-2">
                                         <div className="w-full flex justify-around">
                                             <div
-                                            onClick={()=>mutateAccept(invite._id)} 
+                                            onClick={()=>mutateAccept(invite?._id)} 
                                             className="hover:bg-green-700/10 p-1 rounded-full hover:text-green-700 transition-colors duration-300">
                                                 <FiCheck />
                                             </div>
-                                            <div className="p-1 rounded-full hover:text-red-700 hover:bg-red-700/10 transition-colors duration-300">
+                                            <div
+                                            onClick={()=>mutateReject({inviteID: invite?._id,ownerId: invite?.documentId.owner._id})} 
+                                            className="p-1 rounded-full hover:text-red-700 hover:bg-red-700/10 transition-colors duration-300">
                                                 <RxCross2 />
                                             </div>
                                         </div>

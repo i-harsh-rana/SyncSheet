@@ -12,7 +12,7 @@ function Error({message = "Something went wrong, Please try again!"}) {
                 <motion.div 
                 initial={{x : 0}}
                 animate={{x: [0, -10, 10, -10, 10, 0]}}
-                transition={{duration: 0.3, ease: "easeInOut", repeatDelay: 2, repeat: Infinity}}
+                transition={{duration: 0.3, ease: "easeInOut", repeatDelay: 3, repeat: Infinity}}
                 className='flex items-end'>
                     <Lottie 
                         animationData={errorr} 
@@ -23,7 +23,7 @@ function Error({message = "Something went wrong, Please try again!"}) {
                     />
                     <span className='pb-1 text-golden'>Error!</span>
                 </motion.div>
-                <div className='text-golden mt-4 w-[15rem] h-[10rem] '>
+                <div className='text-golden mt-4 w-[15rem] h-[10rem] font-light'>
                     {message}
                 </div>
             </div>

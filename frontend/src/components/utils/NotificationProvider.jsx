@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNotification, removeNotification } from '../../store/notificationSlice.js';
 import {motion, AnimatePresence} from 'framer-motion'
 import socket from './socket.js'
+import Lottie from 'lottie-react';
+import Tick from '../../assets/icons8-tick.json'
+import Cross from '../../assets/icons8-cross.json'
 
 const NotificationProvider = () => {
   const dispatch = useDispatch();
@@ -25,7 +28,7 @@ const NotificationProvider = () => {
     return () => {
       socket.off('invite-notification', handleNotification);
     };
-  }, [dispatch]);
+  }, [dispatch, currentUser]);
 
   return (
     <div className="fixed top-0 right-0 p-4 z-50 space-y-4">
@@ -43,17 +46,25 @@ const NotificationProvider = () => {
               mass: 1,
               delay: index * 0.1,
             }}
-            className="bg-gradient-to-br from-bg-main via-white to-white text-main-text border-[0.07rem] font-light text-sm border-golden leading-loose text-right p-4 rounded-lg shadow-lg max-w-xs w-full cursor-pointer hover: transition-colors duration-200"
+            className="bg-gradient-to-br from-bg-main via-white to-white text-main-text border-[0.07rem] font-light text-sm border-golden leading-loose  p-4 rounded-lg shadow-lg max-w-xs w-full cursor-pointer hover: transition-colors duration-200"
             onClick={() => dispatch(removeNotification({ id: notification.id }))}
             whileHover={{ scale: 1.03}}
             whileTap={{ scale: 0.98 }}
           >
-            <motion.p
+            <motion.div
             initial={{opacity: 0}}
             animate={{opacity: 1}}
-            transition={{duration: 0.2, delay: 0.5}}>
-              {notification.message}
-            </motion.p>
+            transition={{duration: 0.2}}
+            className='flex items-start'>
+              <Lottie 
+                  animationData={['Invite Accepted' , 'Invite Confirmation' , 'Invite' , 'Invite Sent'].includes(notification.type) ? Tick : Cross} 
+                  loop={true}
+                  autoplay={true}
+                  style={{ width: 25, height: 25}}
+                  className='mt-[0.4rem] ml-2 mr-4'      
+              />
+              <p className='w-[18rem]'>{notification.message}</p>
+            </motion.div>
           </motion.div>
         ))}
       </AnimatePresence>

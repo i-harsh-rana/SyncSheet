@@ -64,7 +64,7 @@ const sendInvite = asyncHandler(async (req, res) => {
 
     // Emit notifications to both inviter and invitee
     io.to(userToInvite._id.toString()).emit('invite-notification', {
-        message: `${req.user.fullName} has invited you to the document with ${permission} access.`,
+        message: `"${req.user.fullName}" has invited you to the document with ${permission} access.`,
         type: 'Invite',
         documentId: docId,
         inviteId: newInvite._id,
@@ -118,7 +118,7 @@ const cancelInvite = asyncHandler(async(req, res) => {
     if (!document) {
         throw new ApiError(404, "Document not found");
     }
-
+    
     // Check if the user has permission to cancel the invite
     // Only document owner can cancel invites
     if (document.owner.toString() !== req.user._id.toString()) {
@@ -216,7 +216,7 @@ const acceptInvite = asyncHandler(async (req, res) => {
 
    try {
      io.to(document.owner.toString()).emit('invite-notification', {
-         message: `${user.fullName} has accepted your invitation to the document.`,
+         message: `"${user.fullName}" has accepted your invitation to the document.`,
          type: 'Invite Accepted',
          documentId: document._id,
          id: Date.now(),
@@ -296,11 +296,58 @@ const allInvitation = asyncHandler(async(req, res)=>{
 
 })
 
+const rejectInvite = asyncHandler(async(req, res)=>{
+    const {ownerId, inviteId} = req.params;
+
+    if(!inviteId){
+        throw new ApiError(400, "Please provide invite ID")
+    }
+
+    const invite = await Invitation.findById(inviteId);
+
+    if(!invite){
+        throw new ApiError(403, "No such invite found, please try again")
+    }
+
+    if(invite.invitedUserEmail !== req.user.email){
+        throw new ApiError(405, "Your don't have permission to reject invite!")
+    }
+    
+
+    await invite.deleteOne();
+
+    try {
+        io.to(ownerId.toString()).emit('invite-notification', {
+            message: `"${req.user.fullName}" has rejected your invitation to the document.`,
+            type: 'Reject',
+            id: Date.now(),
+        });
+    
+        io.to(req.user._id.toString()).emit('invite-notification', {
+            message: `Invite Rejected!`,
+            type: 'Invite Confirmation',
+            id: Date.now(),
+        });
+      } catch (error) {
+       console.log(error);
+       
+      }
+    
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, inviteId, "Rejected!")
+    )
+
+})
+
 export {
     sendInvite,
     cancelInvite,
     cleanupExpiredInvitations,
     acceptInvite,
     allPendingInvites,
-    allInvitation
+    allInvitation,
+    rejectInvite
 }

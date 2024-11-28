@@ -10,7 +10,7 @@ const LoginSignupBtn = ({ children, ...rest }) => {
         {children}
         <i className="fa-solid fa-arrow-right-to-bracket pl-2"></i>
       </span>
-      <span className="absolute top-1/2 left-[2.15rem] -translate-y-1/2 h-[0.8rem] w-[0.8rem] scale-0 transition-all duration-700 group-hover:scale-[15] bg-golden rounded-full" />
+      <span className="absolute top-1/2 left-[2.15rem] -translate-y-1/2 h-[0.8rem] w-[0.8rem] scale-0 transition-all duration-700 group-hover:scale-[15] focus:ring-amber-500 hover:shadow-amber-500/50 bg-gradient-to-r from-amber-300/95 to-amber-600/95 rounded-full" />
     </button>
   );
 };
