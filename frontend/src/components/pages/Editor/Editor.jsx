@@ -15,6 +15,7 @@ import InviteButton from './InviteButton';
 import {Link} from 'react-router-dom'
 import Errorr from '../../utils/Error';
 import LoadingCircular from '../../utils/Loading/LoadingCircular';
+import ChatBot from './ChatBot';
 
 //custom quill editor
 const CustomQuill = forwardRef((props, ref) => (
@@ -295,8 +296,7 @@ const Editor = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4">
-      {console.log(data)
-      }
+      <ChatBot/>
       <div className="font-light flex items-center justify-between">
         <div className='text-2xl font-extralight pl-3'>
           {data?.title}
@@ -482,6 +482,9 @@ const Editor = () => {
       </AnimatePresence>  
 
        {/* Invite Window*/}
+
+   
+    
        
     </div>
   );
