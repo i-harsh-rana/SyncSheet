@@ -90,12 +90,12 @@ Frontend
 ```
 2. Install dependencies:
    
-   Backend:
+Backend:
 ```bash
   cd backend
   npm install
 ```
-   Frontend:
+Frontend:
 ```bash
   cd frontend
   npm install
@@ -115,52 +115,74 @@ Frontend:
 
 ## Screensorts
 
+
+
 Home Page:
+
 
 
 <img width="1418" alt="Screenshot 2025-01-11 at 9 38 25 PM" src="https://github.com/user-attachments/assets/728fe4c2-2305-44e0-8e62-886771085c6d" />
 
 
 
+
 Editor Page:
+
+
 
 
 <img width="1414" alt="Screenshot 2025-01-11 at 9 39 10 PM" src="https://github.com/user-attachments/assets/9d508454-dc45-40a3-9365-5bcf28bfabd4" />
 
 
 
+
 All Docs Page:
+
+
 
 
 <img width="1418" alt="Screenshot 2025-01-11 at 9 38 39 PM" src="https://github.com/user-attachments/assets/8e0575b1-4050-4335-a926-35f76db72c37" />
 
 
 
+
 AI Chat Bot:
+
+
 
 
 <img width="1415" alt="Screenshot 2025-01-11 at 9 39 41 PM" src="https://github.com/user-attachments/assets/75c0a925-c4ac-4d74-b264-466cbc2f3773" />
 
 
 
+
 Login Page: 
+
+
 
 
 <img width="1415" alt="Screenshot 2025-01-11 at 9 44 01 PM" src="https://github.com/user-attachments/assets/2fb6f37d-d2de-4ccd-b16b-d85a2bb299a8" />
 
 
 
+
 Signup Page: 
+
+
 
 
 <img width="1415" alt="Screenshot 2025-01-11 at 9 44 13 PM" src="https://github.com/user-attachments/assets/41cce160-b683-4cdc-82a9-8adff9c24455" />
 
 
 
+
 Dashboard Page: 
 
 
+
+
 <img width="1413" alt="Screenshot 2025-01-11 at 9 38 56 PM" src="https://github.com/user-attachments/assets/d416d0a8-40eb-449c-9047-db6f428f3a63" />
+
 
 
 
